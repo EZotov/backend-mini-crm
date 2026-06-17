@@ -12,7 +12,14 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "migration:prepare": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/configs/db/data-source.ts",
+    "migration:prepare:prod": "cross-env NODE_ENV=production node ./node_modules/typeorm/cli.js -d ./dist/configs/db/data-source.js",
+    "migration:generate": "npm run migration:prepare -- migration:generate",
+    "migration:run": "npm run migration:prepare -- migration:run",
+    "migration:revert": "npm run migration:prepare -- migration:revert",
+    "migration:run:prod": "cross-env NODE_ENV=production npm run migration:prepare:prod -- migration:run",
+    "migration:revert:prod": "cross-env NODE_ENV=production npm run migration:prepare:prod -- migration:revert"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -20,8 +27,12 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.4.4",
+    "@nestjs/typeorm": "^11.0.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "typeorm": "^1.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -33,6 +44,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
     "@types/supertest": "^7.0.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.2.2",
