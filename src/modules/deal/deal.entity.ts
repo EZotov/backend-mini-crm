@@ -8,7 +8,7 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import {Customer} from '../customer/customer.entity';
+import {Customer} from '../customer/entities/customer.entity';
 import {User} from '../user/user.entity';
 
 @Entity({name: 'deals'})

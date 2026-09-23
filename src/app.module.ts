@@ -7,6 +7,7 @@ import {AnalyticsModule} from './modules/analytics/analytics.module';
 import {AuthModule} from './modules/auth/auth.module';
 import {CustomerModule} from './modules/customer/customer.module';
 import {DealModule} from './modules/deal/deal.module';
+import {NotificationModule} from './modules/notification/notification.module';
 import {UserModule} from './modules/user/user.module';
 
 @Module({
@@ -21,6 +22,7 @@ import {UserModule} from './modules/user/user.module';
         AuthModule,
         AnalyticsModule,
         DealModule,
+        NotificationModule,
     ],
     controllers: [],
     providers: [],

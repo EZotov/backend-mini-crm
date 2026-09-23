@@ -1,0 +1,70 @@
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {DEFAULT_ORDER, PAGE_SIZES} from '~/consts';
+import {isUUID} from '~/utils';
+import {Repository} from 'typeorm';
+
+import {CreateCustomerDto, CustomerDto, IdResponseDto} from './dto/customer.dto';
+import {Customer} from './entities/customer.entity';
+
+@Injectable()
+export class CustomerService {
+    constructor(@InjectRepository(Customer) private customerRepository: Repository<Customer>) {}
+
+    async getList(pageSize: number, pageNum: number): Promise<{data: Customer[]; total: number}> {
+        if (!PAGE_SIZES.includes(pageSize) || pageNum < 1) {
+            throw new BadRequestException('Параметры пагинации неверны');
+        }
+
+        const skipCounts = (pageNum - 1) * pageSize;
+
+        const [customers, totalCounts] = await this.customerRepository.findAndCount({
+            skip: skipCounts,
+            take: pageSize,
+            order: DEFAULT_ORDER,
+        });
+
+        return {
+            data: customers,
+            total: totalCounts,
+        };
+    }
+
+    async getById(customerId: string): Promise<CustomerDto> {
+        if (!isUUID(customerId)) {
+            throw new BadRequestException('Передан некорректный формат UUID');
+        }
+
+        const customer = await this.customerRepository.findOneBy({id: customerId});
+
+        if (!customer) {
+            throw new NotFoundException('Заказчик не найден');
+        }
+
+        return customer;
+    }
+
+    async create(dto: CreateCustomerDto): Promise<IdResponseDto> {
+        const result = await this.customerRepository.save(dto);
+
+        return {id: result.id};
+    }
+
+    async updateById(id: string, dto: CreateCustomerDto): Promise<{id: string}> {
+        const result = await this.customerRepository.update(id, {...dto, updatedAt: new Date()});
+
+        if (!result.affected) {
+            throw new NotFoundException(`Заказчик с ID ${id} не найден`);
+        }
+
+        return {id};
+    }
+
+    async removeById(customerId: string) {
+        const result = await this.customerRepository.delete({id: customerId});
+
+        if (!result.affected) {
+            throw new NotFoundException('Заказчик не был найден для удаления');
+        }
+    }
+}
