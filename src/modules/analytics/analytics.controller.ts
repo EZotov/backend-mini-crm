@@ -6,5 +6,7 @@ import {ApiOperation, ApiTags} from '@nestjs/swagger';
 export class AnalyticsController {
     @ApiOperation({summary: 'Получить сводку аналитики'})
     @Get('summary')
-    getSummary() {}
+    getSummary() {
+        return 'Not implemented';
+    }
 }

@@ -6,21 +6,31 @@ import {ApiOperation, ApiTags} from '@nestjs/swagger';
 export class DealController {
     @ApiOperation({summary: 'Получить все сделки'})
     @Get()
-    getAll() {}
+    getAll() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Получить сделку'})
     @Get(':id')
-    get() {}
+    get() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Создать сделку'})
     @Post()
-    create() {}
+    create() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Изменить сделку'})
     @Patch(':id')
-    update() {}
+    update() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Удалить сделку'})
     @Delete(':id')
-    delete() {}
+    delete() {
+        return 'Not implemented';
+    }
 }

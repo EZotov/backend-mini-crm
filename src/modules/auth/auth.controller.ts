@@ -6,17 +6,25 @@ import {ApiOperation, ApiTags} from '@nestjs/swagger';
 export class AuthController {
     @ApiOperation({summary: 'Зарегистрировать нового пользователя'})
     @Post('sign-up')
-    registration() {}
+    registration() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Войти в систему'})
     @Post('sign-in')
-    login() {}
+    login() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Обновить токен аутентификации'})
     @Post('refresh')
-    refresh() {}
+    refresh() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Выйти из системы'})
     @Post('logout')
-    logout() {}
+    logout() {
+        return 'Not implemented';
+    }
 }

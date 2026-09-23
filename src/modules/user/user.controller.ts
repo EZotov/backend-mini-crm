@@ -6,29 +6,43 @@ import {ApiOperation, ApiTags} from '@nestjs/swagger';
 export class UserController {
     @ApiOperation({summary: 'Получить всех пользователей'})
     @Get('users')
-    getAllUsers() {}
+    getAllUsers() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Получить пользователя'})
     @Get('users/:id')
-    getUser() {}
+    getUser() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Изменить данные пользователя'})
     @Patch('users/:id')
-    updateUser() {}
+    updateUser() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Удалить пользователя'})
     @Delete('users/:id')
-    deleteUser() {}
+    deleteUser() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Создать роль'})
     @Post('roles')
-    createRole() {}
+    createRole() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Изменить роль'})
     @Patch('roles/:id')
-    updateRole() {}
+    updateRole() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Удалить роль'})
     @Delete('roles/:id')
-    deleteRole() {}
+    deleteRole() {
+        return 'Not implemented';
+    }
 }

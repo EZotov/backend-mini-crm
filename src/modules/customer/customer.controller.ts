@@ -6,21 +6,31 @@ import {ApiOperation, ApiTags} from '@nestjs/swagger';
 export class CustomerController {
     @ApiOperation({summary: 'Получить всех заказчиков'})
     @Get()
-    getAll() {}
+    getAll() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Получить заказчика'})
     @Get(':id')
-    get() {}
+    get() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Создать нового заказчика'})
     @Post()
-    create() {}
+    create() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Изменить данные заказчика'})
     @Patch(':id')
-    update() {}
+    update() {
+        return 'Not implemented';
+    }
 
     @ApiOperation({summary: 'Удалить заказчика'})
     @Delete(':id')
-    delete() {}
+    delete() {
+        return 'Not implemented';
+    }
 }
