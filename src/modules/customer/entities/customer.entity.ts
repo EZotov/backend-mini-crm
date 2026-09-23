@@ -6,15 +6,15 @@ import {Deal} from '../../deal/deal.entity';
 
 @Entity({name: 'customers'})
 export class Customer {
-    @ApiProperty({required: true})
+    @ApiProperty()
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ApiProperty({required: true})
+    @ApiProperty()
     @Column({name: 'full_title'})
     fullTitle: string;
 
-    @ApiProperty({required: true})
+    @ApiProperty()
     @Column({name: 'short_title', nullable: true})
     shortTitle: string;
 
@@ -22,7 +22,7 @@ export class Customer {
     @Column({unique: true})
     phone: string;
 
-    @ApiProperty({required: true})
+    @ApiProperty()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 

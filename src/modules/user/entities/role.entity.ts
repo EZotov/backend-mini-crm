@@ -1,3 +1,4 @@
+import {ApiProperty} from '@nestjs/swagger';
 import {Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 
 import {User} from './user.entity';
@@ -10,12 +11,15 @@ export const accessAction = {
 
 @Entity({name: 'roles'})
 export class Role {
+    @ApiProperty()
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @ApiProperty()
     @Column()
     title: string;
 
+    @ApiProperty()
     @Column('text', {array: true, default: '{}'})
     access: string[];
 

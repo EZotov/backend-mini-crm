@@ -37,9 +37,3 @@ export class CreateCustomerDto {
     @IsMobilePhone('ru-RU', {}, {message: 'Некорректный формат номера телефона'})
     phone: string;
 }
-
-export class IdResponseDto {
-    @ApiProperty()
-    @IsString()
-    id: string;
-}

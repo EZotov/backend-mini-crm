@@ -1,17 +1,19 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {DEFAULT_ORDER, PAGE_SIZES} from '~/consts';
+import {IdResponseDto} from '~/dto';
+import {ListResponse} from '~/types';
 import {isUUID} from '~/utils';
 import {Repository} from 'typeorm';
 
-import {CreateCustomerDto, CustomerDto, IdResponseDto} from './dto/customer.dto';
+import {CreateCustomerDto, CustomerDto} from './dto/customer.dto';
 import {Customer} from './entities/customer.entity';
 
 @Injectable()
 export class CustomerService {
     constructor(@InjectRepository(Customer) private customerRepository: Repository<Customer>) {}
 
-    async getList(pageSize: number, pageNum: number): Promise<{data: Customer[]; total: number}> {
+    async getList(pageSize: number, pageNum: number): Promise<ListResponse<Customer>> {
         if (!PAGE_SIZES.includes(pageSize) || pageNum < 1) {
             throw new BadRequestException('Параметры пагинации неверны');
         }
