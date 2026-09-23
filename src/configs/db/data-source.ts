@@ -18,5 +18,4 @@ const dataSource = new DataSource({
   ...cliSourceData,
 });
 
-// Для TypeORM CLI scripts
 export default dataSource;

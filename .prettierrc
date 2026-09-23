@@ -2,17 +2,9 @@
   "singleQuote": true,
   "trailingComma": "all",
   "jsxSingleQuote": false,
-  "tabWidth": 2,
+  "tabWidth": 4,
   "semi": true,
   "printWidth": 120,
   "bracketSpacing": false,
-  "endOfLine": "auto",
-  "overrides": [
-        {
-            "files": ["**/*.scss", "**/*.css"],
-            "options": {
-                "singleQuote": false
-            }
-        }
-    ]
+  "endOfLine": "auto"
 }
