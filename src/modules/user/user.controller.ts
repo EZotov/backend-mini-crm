@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} from '@nestjs/common';
 import {ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 import {IdResponseDto} from '~/dto';
 import {ListResponse} from '~/types';
@@ -15,8 +15,8 @@ export class UserController {
 
     @ApiOperation({summary: 'Получить всех пользователей'})
     @Get('users')
-    getAllUsers() {
-        return 'Not implemented';
+    getAllUsers(@Query('pageNum', ParseIntPipe) pageNum: number, @Query('pageSize', ParseIntPipe) pageSize: number) {
+        return this.userService.getUsersList(pageNum, pageSize);
     }
 
     @ApiOperation({summary: 'Получить пользователя'})
@@ -49,20 +49,20 @@ export class UserController {
     @ApiOkResponse({type: IdResponseDto})
     @Post('roles')
     createRole(@Body() createDto: CreateRoleDto) {
-        return this.userService.create(createDto);
+        return this.userService.createRole(createDto);
     }
 
     @ApiOperation({summary: 'Изменить роль'})
     @ApiOkResponse({type: IdResponseDto})
     @Put('roles/:id')
     updateRole(@Param('id') id: string, @Body() updateDto: CreateRoleDto) {
-        return this.userService.updateById(id, updateDto);
+        return this.userService.updateRoleById(id, updateDto);
     }
 
     @ApiOperation({summary: 'Удалить роль'})
     @ApiOkResponse()
     @Delete('roles/:id')
     deleteRole(@Param('id') id: string) {
-        return this.userService.removeById(id);
+        return this.userService.removeRoleById(id);
     }
 }

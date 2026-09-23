@@ -20,7 +20,7 @@ export class CustomerController {
         @Query('pageNum', ParseIntPipe) pageNum: number,
         @Query('pageSize', ParseIntPipe) pageSize: number,
     ): Promise<CustomerAllDto> {
-        return this.customerService.getList(pageSize, pageNum);
+        return this.customerService.getList(pageNum, pageSize);
     }
 
     @ApiOperation({summary: 'Получить заказчика'})

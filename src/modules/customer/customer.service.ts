@@ -1,9 +1,9 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {DEFAULT_ORDER, PAGE_SIZES} from '~/consts';
+import {DEFAULT_ORDER} from '~/consts';
 import {IdResponseDto} from '~/dto';
 import {ListResponse} from '~/types';
-import {isUUID} from '~/utils';
+import {getOffsetAndCheckPaginationParams, isUUID} from '~/utils';
 import {Repository} from 'typeorm';
 
 import {CreateCustomerDto, CustomerDto} from './dto/customer.dto';
@@ -13,12 +13,8 @@ import {Customer} from './entities/customer.entity';
 export class CustomerService {
     constructor(@InjectRepository(Customer) private customerRepository: Repository<Customer>) {}
 
-    async getList(pageSize: number, pageNum: number): Promise<ListResponse<Customer>> {
-        if (!PAGE_SIZES.includes(pageSize) || pageNum < 1) {
-            throw new BadRequestException('Параметры пагинации неверны');
-        }
-
-        const skipCounts = (pageNum - 1) * pageSize;
+    async getList(pageNum: number, pageSize: number): Promise<ListResponse<Customer>> {
+        const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [customers, totalCounts] = await this.customerRepository.findAndCount({
             skip: skipCounts,

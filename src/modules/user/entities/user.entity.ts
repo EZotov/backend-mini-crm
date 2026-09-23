@@ -1,4 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {Exclude} from 'class-transformer';
 import {
     Column,
     CreateDateColumn,
@@ -26,27 +27,31 @@ export class User {
     @Column()
     email: string;
 
+    @Exclude()
     @Column()
     password: string;
 
     @ApiProperty()
-    @Column({name: 'first_name'})
+    @Column({name: 'first_name', nullable: true})
     firstName: string;
 
     @ApiProperty()
-    @Column()
+    @Column({nullable: true})
     patronymic: string;
 
     @ApiProperty()
-    @Column({name: 'last_name'})
+    @Column({name: 'last_name', nullable: true})
     lastName: string;
 
+    @Exclude()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
+    @Exclude()
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
+    @Exclude()
     @DeleteDateColumn({nullable: true, name: 'deleted_at'})
     deletedAt: Date;
 
