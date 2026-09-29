@@ -1,15 +1,18 @@
+import {Activity} from '~/modules/activites/entities/activites.entity';
+import {Customer} from '~/modules/customer/entities/customer.entity';
+import {User} from '~/modules/user/entities/user.entity';
 import {
     Column,
     CreateDateColumn,
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
-import {Customer} from '../customer/entities/customer.entity';
-import {User} from '../user/entities/user.entity';
+import {DealHistory} from './deal-history.entity';
 
 @Entity({name: 'deals'})
 export class Deal {
@@ -44,4 +47,10 @@ export class Deal {
     @ManyToOne(() => Customer, (customer) => customer.deals)
     @JoinColumn({name: 'customer_id'})
     customer: Customer;
+
+    @OneToMany(() => Activity, (activities) => activities.deal)
+    activities: Activity[];
+
+    @OneToMany(() => DealHistory, (dealHistory) => dealHistory.deal)
+    history: DealHistory[];
 }

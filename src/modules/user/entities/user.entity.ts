@@ -1,4 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {Activity} from '~/modules/activites/entities/activites.entity';
+import {Deal} from '~/modules/deal/entities/deal.entity';
 import {Exclude} from 'class-transformer';
 import {
     Column,
@@ -13,7 +15,6 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import {Deal} from '../../deal/deal.entity';
 import {Role} from './role.entity';
 
 @Entity({name: 'users'})
@@ -62,4 +63,7 @@ export class User {
 
     @OneToMany(() => Deal, (deal) => deal.manager)
     deals: Deal[];
+
+    @OneToMany(() => Activity, (activities) => activities.manager)
+    activities: Activity[];
 }
