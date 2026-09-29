@@ -1,98 +1,289 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🚀 B2B Mini-CRM (MVP) с контролем SLA, Real-time сокетами и геймификацией
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**B2B Mini-CRM** — это высокоэффективная CRM-система для управления B2B-продажами. Проект спроектирован с упором на **жесткий контроль качества обработки лидов (SLA)**, **мгновенную синхронизацию данных в реальном времени** и **прозрачную геймифицированную аналитику** для мотивации команды менеджеров.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🎯 1. Бизнес-цели и ключевой функционал
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+* **Контроль SLA (15 минут):** Автоматическая фиксация просрочки первого ответа менеджера по новому лиду с логированием нарушений.
+* **Real-time Канбан-доска:** Управление сделками через смену статусов (Drag-and-Drop) с мгновенным обновлением интерфейса у всей команды.
+* **Управление задачами и касаниями:** Исключение «забытых» сделок с помощью обязательного планирования звонков, встреч или писем.
+* **Геймифицированная аналитика:** Модуль отчетов, формирующий прозрачный рейтинг эффективности менеджеров («Доска почета», KPI по выручке и «Зона риска» по нарушениям SLA).
+* **B2B-архитектура:** Разделение сущностей на контрагентов (Компании) и контактных лиц (Клиенты).
 
-## Project setup
+---
 
-```bash
-$ yarn install
+## 🗄️ 2. Архитектура базы данных (Сущности TypeORM)
+
+В качестве ORM используется **TypeORM**. Структура поддерживает строгие связи (One-to-Many / Many-to-One) и каскадные удаления для поддержания целостности данных.
+
+### 2.1. Управление пользователями и контрагентами
+
+```typescript
+// User.entity.ts (Пользователи / Менеджеры)
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column()
+  passwordHash: string;
+
+  @Column()
+  name: string;
+
+  @Column({ type: 'varchar', default: 'MANAGER' })
+  role: 'MANAGER' | 'ADMIN';
+
+  @OneToMany(() => Deal, (deal) => deal.user)
+  deals: Deal[];
+
+  @OneToMany(() => Activity, (activity) => activity.user)
+  activities: Activity[];
+
+  @OneToMany(() => SlaLog, (slaLog) => slaLog.user)
+  slaLogs: SlaLog[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
 ```
 
-## Compile and run the project
+```typescript
+// Company.entity.ts (Организации / Юрлица)
+@Entity('companies')
+export class Company {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-```bash
-# development
-$ yarn run start
+  @Column()
+  name: string; // Например, "ООО Вектор"
 
-# watch mode
-$ yarn run start:dev
+  @Column({ nullable: true })
+  inn: string; // ИНН для B2B-проверок
 
-# production mode
-$ yarn run start:prod
+  @OneToMany(() => Customer, (customer) => customer.company)
+  contacts: Customer[];
+
+  @OneToMany(() => Deal, (deal) => deal.company)
+  deals: Deal[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
 ```
 
-## Run tests
+```typescript
+// Customer.entity.ts (Контактные лица / Клиенты)
+@Entity('customers')
+export class Customer {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-```bash
-# unit tests
-$ yarn run test
+  @Column()
+  name: string; // Имя контактного лица (например, "Иванов Иван")
 
-# e2e tests
-$ yarn run test:e2e
+  @Column({ unique: true })
+  phone: string;
 
-# test coverage
-$ yarn run test:cov
+  @ManyToOne(() => Company, (company) => company.contacts, { nullable: true, onDelete: 'SET NULL' })
+  company: Company | null;
+
+  @OneToMany(() => Deal, (deal) => deal.customer)
+  deals: Deal[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
 ```
 
-## Deployment
+### 2.2. Сделки, задачи и аудит
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```typescript
+// Deal.entity.ts (Сделки)
+@Entity('deals')
+export class Deal {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+  @Column()
+  title: string;
 
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+  @Column({ type: 'int' })
+  budget: number;
+
+  @Column({ type: 'varchar', default: 'NEW' })
+  status: 'NEW' | 'IN_PROGRESS' | 'INVOICE' | 'WON' | 'LOST';
+
+  @Column({ type: 'timestamp', nullable: true })
+  slaDeadline: Date | null; // Время создания + 15 минут
+
+  @Column({ type: 'boolean', default: false })
+  isSlaViolated: boolean;
+
+  @ManyToOne(() => User, (user) => user.deals, { nullable: true, onDelete: 'SET NULL' })
+  user: User | null;
+
+  @ManyToOne(() => Company, (company) => company.deals, { onDelete: 'CASCADE' })
+  company: Company;
+
+  @ManyToOne(() => Customer, (customer) => customer.deals, { onDelete: 'CASCADE' })
+  customer: Customer;
+
+  @OneToMany(() => Activity, (activity) => activity.deal)
+  activities: Activity[];
+
+  @OneToMany(() => DealHistory, (history) => history.deal)
+  history: DealHistory[];
+
+  @OneToMany(() => SlaLog, (slaLog) => slaLog.deal)
+  slaLogs: SlaLog[];
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+```typescript
+// Activity.entity.ts (Задачи и Касания)
+@Entity('activities')
+export class Activity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-## Resources
+  @Column({ type: 'varchar' })
+  type: 'CALL' | 'EMAIL' | 'MEETING' | 'TELEGRAM';
 
-Check out a few resources that may come in handy when working with NestJS:
+  @Column()
+  description: string;
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+  @Column({ type: 'timestamp' })
+  dueDate: Date; // Дедлайн выполнения задачи
 
-## Support
+  @Column({ type: 'boolean', default: false })
+  isCompleted: boolean;
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+  @ManyToOne(() => Deal, (deal) => deal.activities, { onDelete: 'CASCADE' })
+  deal: Deal;
 
-## Stay in touch
+  @ManyToOne(() => User, (user) => user.activities, { onDelete: 'CASCADE' })
+  user: User; // Ответственный за задачу менеджер
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+  @CreateDateColumn()
+  createdAt: Date;
+}
+```
 
-## License
+```typescript
+// DealHistory.entity.ts (История статусов для Воронки)
+@Entity('deal_history')
+export class DealHistory {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+  @ManyToOne(() => Deal, (deal) => deal.history, { onDelete: 'CASCADE' })
+  deal: Deal;
+
+  @Column()
+  fromStatus: string;
+
+  @Column()
+  toStatus: string;
+
+  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  changedBy: User | null; // Кто передвинул карточку
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
+```
+
+```typescript
+// SlaLog.entity.ts (Журнал нарушений SLA)
+@Entity('sla_logs')
+export class SlaLog {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @ManyToOne(() => Deal, (deal) => deal.slaLogs, { onDelete: 'CASCADE' })
+  deal: Deal;
+
+  @ManyToOne(() => User, (user) => user.slaLogs, { nullable: true, onDelete: 'SET NULL' })
+  user: User | null; // Кто просрочил лид
+
+  @Column({ type: 'int' })
+  minutesOverdue: number; // На сколько минут затянули ответ
+
+  @CreateDateColumn()
+  createdAt: Date;
+}
+```
+
+---
+
+## 🔌 3. Спецификация REST API Эндпоинтов
+
+Префикс всех эндпоинтов: `/api/v1`
+
+### 3.1. Модуль Аутентификации (`/auth`, `/me`)
+* **`POST /auth/login`** — Авторизация, выдача JWT. Body: `{ "email": "...", "password": "..." }`.
+* **`GET /me`** — Получение профиля текущего пользователя по Bearer токену.
+
+### 3.2. Модуль Компаний и Клиентов (`/companies`, `/customers`)
+* **`GET /companies`** — Список компаний с пагинацией и поиском по имени/ИНН.
+* **`POST /companies`** — Создание компании. Body: `{ "name": "...", "inn": "..." }`.
+* **`GET /customers`** — Список контактных лиц с фильтром по `companyId`.
+* **`POST /customers`** — Создание контакта с привязкой к компании. Body: `{ "name": "...", "phone": "...", "companyId": "uuid" }`.
+
+### 3.3. Модуль Сделок и Канбана (`/deals`)
+* **`GET /deals`** — Получение списка сделок с группировкой по статусам для Канбан-доски.
+* **`POST /deals`** — Создание сделки. Бэкенд выставляет `slaDeadline` на `createdAt + 15 минут`. Status по умолчанию: `NEW`. Body: `{ "title": "...", "budget": 10000, "companyId": "uuid", "customerId": "uuid" }`.
+* **`PATCH /deals/:id`** — Перенос сделки (Drag-and-Drop) или назначение менеджера.
+  * **Важная логика:** При переходе из `NEW` в `IN_PROGRESS` проверяется `slaDeadline`. Если время вышло, бэкенд выставляет `isSlaViolated = true`, создает запись в `SlaLog`, фиксирует смену статуса в `DealHistory` и через сокеты рассылает триггер.
+* **`GET /deals/:id/history`** — Получение лога перемещения конкретной сделки по стадиям воронки.
+
+### 3.4. Модуль Задач (`/deals/:dealId/activities`)
+* **`GET /deals/:dealId/activities`** — Чек-лист текущих и закрытых задач по сделке.
+* **`POST /deals/:dealId/activities`** — Планирование новой задачи. Body: `{ "type": "CALL", "description": "...", "dueDate": "2026-10-01T12:00:00Z" }`.
+* **`PATCH /deals/:dealId/activities/:activityId`** — Закрытие задача (перевод `isCompleted` в `true`).
+
+### 3.5. Модуль Аналитики (`/analytics`)
+* **`GET /analytics/summary`** — Сводный геймифицированный дашборд.
+  * *Response (200):*
+```json
+{
+  "financials": {
+    "totalVolume": 4800000,
+    "averageBudget": 160000,
+    "forgottenDealsCount": 3
+  },
+  "funnel": {
+    "conversionRate": 28.4,
+    "weakestStage": "INVOICE",
+    "averageStageDurations": {
+      "NEW": "12 минут",
+      "IN_PROGRESS": "4 дня",
+      "INVOICE": "9 дней"
+    }
+  },
+  "gamification": {
+    "boardOfHonor": [
+      { "rank": 1, "name": "Алексей Иванов", "wonBudget": 2100000 }
+    ],
+    "dangerZone": [
+      {
+        "name": "Игорь Сидоров",
+        "slaViolationRatePercentage": 24.0,
+        "totalViolationsCount": 12,
+        "averageOverdueMinutes": 45
+      }
+    ]
+  }
+} 
