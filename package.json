@@ -1,7 +1,7 @@
 {
   "name": "backend-cloud-editor",
   "version": "0.0.1",
-  "description": "Преобразователь файлов",
+  "description": "Mini CRM MVP",
   "author": "Evgeniy Zotov",
   "private": true,
   "license": "UNLICENSED",

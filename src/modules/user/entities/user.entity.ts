@@ -1,5 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Activity} from '~/modules/activites/entities/activites.entity';
+import {SlaLog} from '~/modules/activites/entities/sla.entity';
 import {Deal} from '~/modules/deal/entities/deal.entity';
 import {Exclude} from 'class-transformer';
 import {
@@ -66,4 +67,7 @@ export class User {
 
     @OneToMany(() => Activity, (activities) => activities.manager)
     activities: Activity[];
+
+    @OneToMany(() => SlaLog, (logs) => logs.manager)
+    slaLogs: SlaLog[];
 }
