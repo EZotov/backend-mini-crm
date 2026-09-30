@@ -34,11 +34,11 @@ export class Activity {
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
-    @JoinColumn({name: 'deal_id'})
     @ManyToOne(() => Deal, (deal) => deal.activities, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'deal_id'})
     deal: Deal;
 
-    @JoinColumn({name: 'manager_id'})
     @OneToOne(() => User, (user) => user.activities, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'manager_id'})
     manager: User; // Ответственный за задачу менеджер
 }

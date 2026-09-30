@@ -24,11 +24,11 @@ export class SlaLog {
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
-    @JoinColumn({name: 'deal_id'})
     @ManyToOne(() => Deal, (deal) => deal.slaLogs, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'deal_id'})
     deal: Deal;
 
-    @JoinColumn({name: 'manager_id'})
     @ManyToOne(() => User, (user) => user.slaLogs, {nullable: true, onDelete: 'SET NULL'})
-    manager: User;
+    @JoinColumn({name: 'manager_id'})
+    manager: User | null;
 }

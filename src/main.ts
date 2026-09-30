@@ -39,6 +39,8 @@ async function bootstrap() {
         }),
     );
 
+    app.setGlobalPrefix('v1');
+
     await app.listen(port);
 }
 bootstrap();

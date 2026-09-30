@@ -14,9 +14,6 @@ export class DealHistory {
     @Column({name: 'to_status'})
     toStatus: string;
 
-    @ManyToOne(() => User, {nullable: true, onDelete: 'SET NULL'})
-    changedBy: User | null; // Кто передвинул карточку
-
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
@@ -25,4 +22,7 @@ export class DealHistory {
 
     @ManyToOne(() => Deal, (deal) => deal.history, {onDelete: 'CASCADE'})
     deal: Deal;
+
+    @ManyToOne(() => User, {nullable: true, onDelete: 'SET NULL'})
+    changedBy: User | null;
 }

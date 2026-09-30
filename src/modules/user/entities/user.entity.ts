@@ -60,7 +60,7 @@ export class User {
     @ApiProperty({type: Role})
     @OneToOne(() => Role, (role) => role.user, {nullable: true, onDelete: 'SET NULL'})
     @JoinColumn({name: 'role_id'})
-    role: Role;
+    role: Role | null;
 
     @OneToMany(() => Deal, (deal) => deal.manager)
     deals: Deal[];

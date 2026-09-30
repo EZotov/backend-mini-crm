@@ -44,7 +44,7 @@ export class Customer {
     @OneToMany(() => Deal, (deal) => deal.customer)
     deals: Deal[];
 
-    @JoinColumn({name: 'company_id'})
     @ManyToOne(() => Company, (company) => company.contacts)
+    @JoinColumn({name: 'company_id'})
     company: Company;
 }
