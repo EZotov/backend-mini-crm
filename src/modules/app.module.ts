@@ -2,13 +2,13 @@ import {Module} from '@nestjs/common';
 import {ConfigModule} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
 
-import getDBConfig from './configs/db/options';
-import {AnalyticsModule} from './modules/analytics/analytics.module';
-import {AuthModule} from './modules/auth/auth.module';
-import {CustomerModule} from './modules/customer/customer.module';
-import {DealModule} from './modules/deal/deal.module';
-import {NotificationModule} from './modules/notification/notification.module';
-import {UserModule} from './modules/user/user.module';
+import getDBConfig from '../configs/db/options';
+import {AnalyticsModule} from './analytics/analytics.module';
+import {AuthModule} from './auth/auth.module';
+import {CustomerModule} from './customer/customer.module';
+import {DealModule} from './deal/deal.module';
+import {NotificationModule} from './notification/notification.module';
+import {UserModule} from './user/user.module';
 
 @Module({
     imports: [
