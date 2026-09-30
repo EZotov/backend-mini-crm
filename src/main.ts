@@ -5,16 +5,21 @@ import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 
 import {AppModule} from './app.module';
 
+const globalPrefix = 'v1';
+
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     const configService = app.get(ConfigService);
     const port = configService.get<number>('PORT') || 3001;
 
+    app.setGlobalPrefix(globalPrefix);
+
     const config = new DocumentBuilder()
         .setTitle('Mini CRM')
         .setDescription('API мини CRM')
         .setVersion('1.0')
+        .setBasePath(globalPrefix)
         .addBearerAuth()
         .build();
 
@@ -39,8 +44,7 @@ async function bootstrap() {
         }),
     );
 
-    app.setGlobalPrefix('v1');
-
     await app.listen(port);
 }
+
 bootstrap();
