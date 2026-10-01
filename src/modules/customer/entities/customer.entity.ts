@@ -1,5 +1,4 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Deal} from '~/modules/deal/entities/deal.entity';
 import {Exclude} from 'class-transformer';
 import {
     Column,
@@ -12,6 +11,8 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
+import {Deal} from '~/modules/deal/entities/deal.entity';
+
 import {Company} from './company.entity';
 
 @Entity({name: 'customers'})
@@ -21,12 +22,16 @@ export class Customer {
     id: string;
 
     @ApiProperty()
-    @Column({name: 'full_title'})
-    fullTitle: string;
+    @Column({name: 'last_name'})
+    lastName: string;
 
     @ApiProperty()
-    @Column({name: 'short_title', nullable: true})
-    shortTitle: string;
+    @Column({nullable: true})
+    patronymic: string;
+
+    @ApiProperty()
+    @Column({name: 'first_name'})
+    firstName: string;
 
     @ApiProperty({required: true})
     @Column({unique: true})

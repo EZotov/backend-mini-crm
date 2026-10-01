@@ -1,7 +1,8 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Deal} from '~/modules/deal/entities/deal.entity';
 import {Exclude} from 'class-transformer';
 import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+
+import {Deal} from '~/modules/deal/entities/deal.entity';
 
 import {Customer} from './customer.entity';
 
@@ -12,12 +13,16 @@ export class Company {
     id: string;
 
     @ApiProperty()
-    @Column()
-    name: string; // Например, "ООО Вектор"
+    @Column({name: 'full_title'})
+    fullTitle: string;
+
+    @ApiProperty()
+    @Column({name: 'short_title', nullable: true})
+    shortTitle: string;
 
     @ApiProperty()
     @Column({nullable: true})
-    inn: string; // ИНН для B2B-проверок
+    inn: string;
 
     @CreateDateColumn()
     createdAt: Date;
