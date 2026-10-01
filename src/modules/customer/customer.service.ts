@@ -1,10 +1,11 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+
 import {DEFAULT_ORDER} from '~/consts';
 import {IdResponseDto} from '~/dto';
-import {ListResponse} from '~/types';
+import {ListResponse} from '~/interfaces';
 import {getOffsetAndCheckPaginationParams, isUUID} from '~/utils';
-import {Repository} from 'typeorm';
 
 import {CreateCustomerDto, CustomerDto} from './dto/customer.dto';
 import {Customer} from './entities/customer.entity';

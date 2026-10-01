@@ -25,7 +25,12 @@
         "strictPropertyInitialization": false,
         "noFallthroughCasesInSwitch": false,
         "paths": {
-          "~/*": ["src/*"]
+            "@dto/*": ["src/dto/*"],
+            "@guards/*": ["src/guards/*"],
+            "@decorators/*": ["src/decorators/*"],
+            "@consts/*": ["src/consts/*"],
+            "@interfaces/*": ["src/interfaces/*"],
+            "~/*": ["src/*"],
         }
     },
     "exclude": ["node_modules", "dist"]

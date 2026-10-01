@@ -1,4 +1,5 @@
 import {BadRequestException} from '@nestjs/common';
+
 import {PAGE_SIZES} from '~/consts';
 
 export const isUUID = (value: string): boolean => {

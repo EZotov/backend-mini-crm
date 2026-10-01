@@ -1,9 +1,10 @@
 import {createParamDecorator, ExecutionContext} from '@nestjs/common';
-import {AuthenticatedRequest, JwtPayload} from '~/modules/auth/types';
 
-export const UserTokenData = createParamDecorator((data: keyof JwtPayload | undefined, ctx: ExecutionContext) => {
+import type {AuthenticatedRequest, JwtPayload} from '@interfaces/auth.interface';
+
+export const UserTokenData = createParamDecorator((payloadKey: keyof JwtPayload | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<AuthenticatedRequest>();
     const user = request.user;
 
-    return data && user ? user[data] : user;
+    return payloadKey && user ? user[payloadKey] : user;
 });

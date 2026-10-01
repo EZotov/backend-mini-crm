@@ -1,11 +1,12 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {DEFAULT_ORDER, PASSWORD_SALT} from '~/consts';
-import {IdResponseDto} from '~/dto';
-import {ListResponse} from '~/types';
-import {getOffsetAndCheckPaginationParams, isUUID} from '~/utils';
 import {hash} from 'bcrypt';
 import {Repository} from 'typeorm';
+
+import {DEFAULT_ORDER, PASSWORD_SALT} from '~/consts';
+import {IdResponseDto} from '~/dto';
+import {ListResponse} from '~/interfaces';
+import {getOffsetAndCheckPaginationParams, isUUID} from '~/utils';
 
 import {CreateRoleDto} from './dto/role.dto';
 import {CreateUserDto, UpdateUserDto} from './dto/user.dto';

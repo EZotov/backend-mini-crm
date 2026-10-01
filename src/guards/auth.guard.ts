@@ -1,6 +1,6 @@
 import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '@nestjs/common';
 
-import {AuthenticatedRequest, JwtPayload} from '../types';
+import {AuthenticatedRequest, JwtPayload} from '@interfaces/auth.interface';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 

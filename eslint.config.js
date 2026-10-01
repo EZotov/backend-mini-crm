@@ -33,8 +33,9 @@ export default defineConfig(
         rules: {
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/no-floating-promises': 'off',
-            '@typescript-eslint/no-unsafe-argument': 'warn',
-            '@typescript-eslint/no-unsafe-assignment': 'warn',
+            '@typescript-eslint/no-unsafe-argument': 'off',
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-unsafe-return': 'off',
             '@typescript-eslint/no-unsafe-call': 'off',
             '@typescript-eslint/no-unsafe-member-access': "off",
             'prettier/prettier': ['error', { endOfLine: 'auto' }],
@@ -56,9 +57,12 @@ export default defineConfig(
             "error",
                 {
                     "groups": [
-                        ["^"],       // 1. Внешние пакеты и библиотеки (npm)
-                        ["^\\."],    // 2. Локальные (относительные) импорты
-                        ["^.*css"]   // 3. Файлы стилей (CSS/SCSS)
+                       // 1. Внешние пакеты и библиотеки (NPM-модули)
+                        ["^@?\\w"],
+                        // 2. Кастомные алиасы и внутренние модули (например, @shared, @modules, ~/components)
+                        ["^@(consts|dto|interfaces|utils|decorators|guards)(/|$)", "^~/", "^src/", ],
+                        // 3. Локальные (относительные) импорты (./ и ../)
+                        ["^\\."],
                     ]
                 }
             ],
