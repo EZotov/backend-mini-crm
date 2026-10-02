@@ -33,11 +33,11 @@ export class Customer {
     @Column({name: 'first_name'})
     firstName: string;
 
-    @ApiProperty({required: true})
+    @ApiProperty()
     @Column({unique: true})
     phone: string;
 
-    @ApiProperty()
+    @Exclude()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
@@ -45,10 +45,10 @@ export class Customer {
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
-    @Exclude()
     @OneToMany(() => Deal, (deal) => deal.customer)
     deals: Deal[];
 
+    @ApiProperty({type: Company})
     @ManyToOne(() => Company, (company) => company.contacts)
     @JoinColumn({name: 'company_id'})
     company: Company;

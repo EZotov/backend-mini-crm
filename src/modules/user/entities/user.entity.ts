@@ -1,7 +1,4 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Activity} from '~/modules/activites/entities/activites.entity';
-import {SlaLog} from '~/modules/activites/entities/sla.entity';
-import {Deal} from '~/modules/deal/entities/deal.entity';
 import {Exclude} from 'class-transformer';
 import {
     Column,
@@ -15,6 +12,10 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
+
+import {Activity} from '~/modules/activites/entities/activites.entity';
+import {SlaLog} from '~/modules/activites/entities/sla.entity';
+import {Deal} from '~/modules/deal/entities/deal.entity';
 
 import {Role} from './role.entity';
 
@@ -57,7 +58,7 @@ export class User {
     @DeleteDateColumn({nullable: true, name: 'deleted_at'})
     deletedAt: Date;
 
-    @ApiProperty({type: Role})
+    @ApiProperty({type: Role, nullable: true})
     @OneToOne(() => Role, (role) => role.user, {nullable: true, onDelete: 'SET NULL'})
     @JoinColumn({name: 'role_id'})
     role: Role | null;

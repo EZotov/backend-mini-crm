@@ -24,7 +24,8 @@ export class Company {
     @Column({nullable: true})
     inn: string;
 
-    @CreateDateColumn()
+    @Exclude()
+    @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
     @Exclude()
