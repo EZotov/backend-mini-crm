@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} from '@nestjs/common';
 import {ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 
-import {IdResponseDto} from '~/dto';
+import {CreateResponseDto} from '~/dto';
 
 import {CustomerService} from './customer.service';
 import {CreateCustomerDto, CustomerAllDto, CustomerDto} from './dto/customer.dto';
@@ -17,10 +17,7 @@ export class CustomerController {
         type: CustomerAllDto,
     })
     @Get()
-    getAll(
-        @Query('pageNum', ParseIntPipe) pageNum: number,
-        @Query('pageSize', ParseIntPipe) pageSize: number,
-    ): Promise<CustomerAllDto> {
+    getAll(@Query('pageNum', ParseIntPipe) pageNum: number, @Query('pageSize', ParseIntPipe) pageSize: number) {
         return this.customerService.getList(pageNum, pageSize);
     }
 
@@ -35,14 +32,14 @@ export class CustomerController {
     }
 
     @ApiOperation({summary: 'Создать нового заказчика'})
-    @ApiOkResponse({type: IdResponseDto})
+    @ApiOkResponse({type: CreateResponseDto})
     @Post()
-    create(@Body() createDto: CreateCustomerDto): Promise<IdResponseDto> {
+    create(@Body() createDto: CreateCustomerDto): Promise<CreateResponseDto> {
         return this.customerService.create(createDto);
     }
 
     @ApiOperation({summary: 'Изменить данные заказчика'})
-    @ApiOkResponse({type: IdResponseDto})
+    @ApiOkResponse({type: CreateResponseDto})
     @Put(':id')
     update(@Param('id') id: string, @Body() updateDto: CreateCustomerDto) {
         return this.customerService.updateById(id, updateDto);

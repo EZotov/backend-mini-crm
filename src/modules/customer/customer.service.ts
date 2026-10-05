@@ -3,8 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '~/consts';
-import {IdResponseDto} from '~/dto';
-import {ListResponse} from '~/interfaces';
+import {CollectionResponseDto, CreateResponseDto} from '~/dto';
 import {getOffsetAndCheckPaginationParams, isUUID} from '~/utils';
 
 import {CreateCustomerDto, CustomerDto} from './dto/customer.dto';
@@ -14,7 +13,7 @@ import {Customer} from './entities/customer.entity';
 export class CustomerService {
     constructor(@InjectRepository(Customer) private readonly customerRepository: Repository<Customer>) {}
 
-    async getList(pageNum: number, pageSize: number): Promise<ListResponse<Customer>> {
+    async getList(pageNum: number, pageSize: number): Promise<CollectionResponseDto<Customer>> {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [customers, totalCounts] = await this.customerRepository.findAndCount({
@@ -43,7 +42,7 @@ export class CustomerService {
         return customer;
     }
 
-    async create(dto: CreateCustomerDto): Promise<IdResponseDto> {
+    async create(dto: CreateCustomerDto): Promise<CreateResponseDto> {
         const result = await this.customerRepository.save(dto);
 
         return {id: result.id};

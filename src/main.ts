@@ -3,6 +3,7 @@ import {ConfigService} from '@nestjs/config';
 import {NestFactory, Reflector} from '@nestjs/core';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 
+import {ExceptionsFilter} from './filters/errors.filter';
 import {AppModule} from './modules/app.module';
 
 const globalPrefix = 'v1';
@@ -27,7 +28,7 @@ async function bootstrap() {
     SwaggerModule.setup('api-docs', app, document);
 
     app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-    // app.useGlobalFilters(new ExceptionsFilter());
+    app.useGlobalFilters(new ExceptionsFilter());
     app.useGlobalPipes(
         new ValidationPipe({
             whitelist: true,

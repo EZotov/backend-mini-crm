@@ -3,7 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '@consts/index';
-import {IdResponseDto} from '@dto/index';
+import {CreateResponseDto} from '@dto/index';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {CreateCompanyDto} from './dto/company.dto';
@@ -38,11 +38,11 @@ export class CompanyService {
         return company;
     }
 
-    create(dto: CreateCompanyDto): Promise<IdResponseDto> {
+    create(dto: CreateCompanyDto): Promise<CreateResponseDto> {
         return this.companyRepository.save(dto);
     }
 
-    async updateById(id: string, dto: CreateCompanyDto): Promise<IdResponseDto> {
+    async updateById(id: string, dto: CreateCompanyDto): Promise<CreateResponseDto> {
         const result = await this.companyRepository.update(id, dto);
 
         if (!result.affected) {

@@ -4,8 +4,7 @@ import {hash} from 'bcrypt';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER, PASSWORD_SALT} from '~/consts';
-import {IdResponseDto} from '~/dto';
-import {ListResponse} from '~/interfaces';
+import {CollectionResponseDto, CreateResponseDto} from '~/dto';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {CreateRoleDto} from './dto/role.dto';
@@ -56,7 +55,7 @@ export class UserService {
 
     // TODO: завести метод обновления пароля
 
-    async updateUserProfile(userId: string, updateDto: UpdateUserDto): Promise<IdResponseDto> {
+    async updateUserProfile(userId: string, updateDto: UpdateUserDto): Promise<CreateResponseDto> {
         const result = await this.userRepository.update(userId, updateDto);
 
         if (!result.affected) {
@@ -75,7 +74,7 @@ export class UserService {
     }
 
     // Roles
-    async getRolesList(): Promise<ListResponse<Role>> {
+    async getRolesList(): Promise<CollectionResponseDto<Role>> {
         const [list, total] = await this.roleRepository.findAndCount({order: DEFAULT_ORDER});
 
         return {
@@ -84,13 +83,13 @@ export class UserService {
         };
     }
 
-    async createRole(createDto: CreateRoleDto): Promise<IdResponseDto> {
+    async createRole(createDto: CreateRoleDto): Promise<CreateResponseDto> {
         const result = await this.roleRepository.save(createDto);
 
         return {id: result.id};
     }
 
-    async updateRoleById(id: string, updateDto: CreateRoleDto): Promise<IdResponseDto> {
+    async updateRoleById(id: string, updateDto: CreateRoleDto): Promise<CreateResponseDto> {
         const result = await this.roleRepository.update(id, updateDto);
 
         if (!result.affected) {

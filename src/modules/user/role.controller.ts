@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Param, Post, Put} from '@nestjs/common';
 import {ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 
-import {IdResponseDto} from '@dto/index';
+import {CreateResponseDto} from '@dto/index';
 
 import {CreateRoleDto} from './dto/role.dto';
 import {UserService} from './user.service';
@@ -12,14 +12,14 @@ export class RoleController {
     constructor(private readonly userService: UserService) {}
 
     @ApiOperation({summary: 'Создать роль'})
-    @ApiOkResponse({type: IdResponseDto})
+    @ApiOkResponse({type: CreateResponseDto})
     @Post()
     createRole(@Body() createDto: CreateRoleDto) {
         return this.userService.createRole(createDto);
     }
 
     @ApiOperation({summary: 'Изменить роль'})
-    @ApiOkResponse({type: IdResponseDto})
+    @ApiOkResponse({type: CreateResponseDto})
     @Put(':id')
     updateRole(@Param('id') id: string, @Body() updateDto: CreateRoleDto) {
         return this.userService.updateRoleById(id, updateDto);
