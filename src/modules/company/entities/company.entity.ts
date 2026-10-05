@@ -4,7 +4,7 @@ import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Upd
 
 import {Deal} from '~/modules/deal/entities/deal.entity';
 
-import {Customer} from './customer.entity';
+import {Customer} from '../../customer/entities/customer.entity';
 
 @Entity({name: 'company'})
 export class Company {

@@ -5,6 +5,7 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import getDBConfig from '../configs/db/options';
 import {AnalyticsModule} from './analytics/analytics.module';
 import {AuthModule} from './auth/auth.module';
+import {CompanyModule} from './company/company.module';
 import {CustomerModule} from './customer/customer.module';
 import {DealModule} from './deal/deal.module';
 import {NotificationModule} from './notification/notification.module';
@@ -17,6 +18,7 @@ import {UserModule} from './user/user.module';
             envFilePath: '.env',
         }),
         TypeOrmModule.forRoot({...getDBConfig(), autoLoadEntities: true}),
+        CompanyModule,
         CustomerModule,
         UserModule,
         AuthModule,

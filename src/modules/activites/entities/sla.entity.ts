@@ -1,5 +1,3 @@
-import {Deal} from '~/modules/deal/entities/deal.entity';
-import {User} from '~/modules/user/entities/user.entity';
 import {
     Column,
     CreateDateColumn,
@@ -10,13 +8,16 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
+import {Deal} from '~/modules/deal/entities/deal.entity';
+import {User} from '~/modules/user/entities/user.entity';
+
 @Entity('sla_logs')
 export class SlaLog {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({type: 'int'})
-    minutesOverdue: number; // На сколько минут затянули ответ
+    minutesOverdue: number;
 
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;

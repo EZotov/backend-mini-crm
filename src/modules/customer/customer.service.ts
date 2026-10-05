@@ -12,7 +12,7 @@ import {Customer} from './entities/customer.entity';
 
 @Injectable()
 export class CustomerService {
-    constructor(@InjectRepository(Customer) private customerRepository: Repository<Customer>) {}
+    constructor(@InjectRepository(Customer) private readonly customerRepository: Repository<Customer>) {}
 
     async getList(pageNum: number, pageSize: number): Promise<ListResponse<Customer>> {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);

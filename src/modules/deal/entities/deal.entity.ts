@@ -1,4 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {Exclude} from 'class-transformer';
 import {
     Column,
     CreateDateColumn,
@@ -12,10 +13,12 @@ import {
 
 import {Activity} from '~/modules/activites/entities/activites.entity';
 import {SlaLog} from '~/modules/activites/entities/sla.entity';
-import {Company} from '~/modules/customer/entities/company.entity';
+import {Company} from '~/modules/company/entities/company.entity';
 import {Customer} from '~/modules/customer/entities/customer.entity';
 import {User} from '~/modules/user/entities/user.entity';
 
+import {DEAL_STATUS, DEAL_STATUS_ENUM} from '../consts';
+import type {DealStatus} from '../types';
 import {DealHistory} from './deal-history.entity';
 
 @Entity({name: 'deals'})
@@ -29,25 +32,27 @@ export class Deal {
     title: string;
 
     @ApiProperty()
-    @Column()
+    @Column({type: 'numeric'})
     budget: number;
 
-    @ApiProperty()
-    @Column({enum: ['NEW', 'IN_PROGRESS', 'INVOICE', 'WON', 'LOST']})
-    status: string;
+    @ApiProperty({enum: DEAL_STATUS_ENUM})
+    @Column({enum: DEAL_STATUS_ENUM, default: DEAL_STATUS.NEW})
+    status: DealStatus;
 
     @ApiProperty()
     @Column({name: 'sla_deadline', type: 'timestamp', nullable: true})
     slaDeadline: Date;
 
     @ApiProperty()
-    @Column({name: 'is_sla_violated', default: false})
+    @Column({name: 'is_sla_violated', default: false, type: 'boolean'})
     isSlaViolated: boolean;
 
+    @Exclude()
     @ApiProperty()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
+    @Exclude()
     @ApiProperty()
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;

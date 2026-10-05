@@ -3,6 +3,7 @@ import {ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 
 import {ROLES} from '@consts/index';
 import {UserTokenData} from '@decorators/user-auth-data.decorator';
+import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {UpdateUserDto} from './dto/user.dto';
 import {User} from './entities/user.entity';
@@ -22,7 +23,7 @@ export class UserController {
     @ApiOperation({summary: 'Получить профиль пользователя'})
     @ApiOkResponse({type: User})
     @Get(':id')
-    getUser(@Param('id') userId: string) {
+    getUser(@Param('id', ParseUUIDModifyPipe) userId: string) {
         return this.userService.getUserById(userId);
     }
 
@@ -49,7 +50,7 @@ export class MeUserController {
     constructor(private readonly userService: UserService) {}
     @ApiOperation({summary: 'Получить свой профиль по токену'})
     @Get()
-    me(@UserTokenData('id') id: string) {
+    me(@UserTokenData('id', ParseUUIDModifyPipe) id: string) {
         return this.userService.getUserById(id);
     }
 

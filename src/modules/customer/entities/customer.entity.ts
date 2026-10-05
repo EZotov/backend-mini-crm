@@ -13,7 +13,7 @@ import {
 
 import {Deal} from '~/modules/deal/entities/deal.entity';
 
-import {Company} from './company.entity';
+import {Company} from '../../company/entities/company.entity';
 
 @Entity({name: 'customers'})
 export class Customer {
@@ -25,7 +25,7 @@ export class Customer {
     @Column({name: 'last_name'})
     lastName: string;
 
-    @ApiProperty()
+    @ApiProperty({nullable: true})
     @Column({nullable: true})
     patronymic: string;
 

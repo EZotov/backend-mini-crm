@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {hash} from 'bcrypt';
 import {Repository} from 'typeorm';
@@ -6,7 +6,7 @@ import {Repository} from 'typeorm';
 import {DEFAULT_ORDER, PASSWORD_SALT} from '~/consts';
 import {IdResponseDto} from '~/dto';
 import {ListResponse} from '~/interfaces';
-import {getOffsetAndCheckPaginationParams, isUUID} from '~/utils';
+import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {CreateRoleDto} from './dto/role.dto';
 import {CreateUserDto, UpdateUserDto} from './dto/user.dto';
@@ -36,11 +36,6 @@ export class UserService {
     }
 
     async getUserById(id: string) {
-        // TODO: Перенести чек параметров в мидлвар-декоратор
-        if (!isUUID(id)) {
-            throw new BadRequestException('Передан некорректный формат UUID');
-        }
-
         const user = await this.userRepository.findOneBy({id});
 
         if (!user) {

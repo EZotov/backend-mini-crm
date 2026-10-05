@@ -1,5 +1,4 @@
-import {Deal} from '~/modules/deal/entities/deal.entity';
-import {User} from '~/modules/user/entities/user.entity';
+import {ApiProperty} from '@nestjs/swagger';
 import {
     Column,
     CreateDateColumn,
@@ -11,13 +10,20 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
+import {Deal} from '~/modules/deal/entities/deal.entity';
+import {User} from '~/modules/user/entities/user.entity';
+
+import {ACTIVITY_ENUM} from '../consts';
+import type {ActivityType} from '../types';
+
 @Entity('activities')
 export class Activity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({type: 'varchar'})
-    type: 'CALL' | 'EMAIL' | 'MEETING' | 'TELEGRAM';
+    @ApiProperty({enum: ACTIVITY_ENUM})
+    @Column({enum: ACTIVITY_ENUM})
+    type: ActivityType;
 
     @Column()
     description: string;

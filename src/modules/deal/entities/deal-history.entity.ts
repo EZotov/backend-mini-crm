@@ -3,6 +3,8 @@ import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Upd
 
 import {User} from '~/modules/user/entities/user.entity';
 
+import {DEAL_STATUS_ENUM} from '../consts';
+import type {DealStatus} from '../types';
 import {Deal} from './deal.entity';
 
 @Entity('deal_history')
@@ -11,13 +13,13 @@ export class DealHistory {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ApiProperty()
-    @Column({name: 'form_status'})
-    fromStatus: string;
+    @ApiProperty({enum: DEAL_STATUS_ENUM})
+    @Column({name: 'form_status', enum: DEAL_STATUS_ENUM})
+    fromStatus: DealStatus;
 
-    @ApiProperty()
-    @Column({name: 'to_status'})
-    toStatus: string;
+    @ApiProperty({enum: DEAL_STATUS_ENUM})
+    @Column({name: 'to_status', enum: DEAL_STATUS_ENUM})
+    toStatus: DealStatus;
 
     @ApiProperty()
     @CreateDateColumn({name: 'created_at'})
