@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
@@ -29,19 +29,37 @@ export class DealService {
     }
 
     async getById(id: string): Promise<ResponseDto<Deal>> {
-        return {data: {} as Deal};
+        const deal = await this.dealRepository.findOne({where: {id}});
+
+        if (!deal) {
+            throw new NotFoundException(`Сделка по ${id} не найдена`);
+        }
+
+        return {data: deal};
     }
 
-    create(dto: CreateDealDto): Promise<CreateResponseDto> {
-        return {data: 'Not implemented'};
+    async create(dto: CreateDealDto): Promise<ResponseDto<CreateResponseDto>> {
+        const result = await this.dealRepository.save({...dto});
+
+        return {data: {id: result.id}};
     }
 
     async updateById(id: string, dto: UpdateDealDto): Promise<ResponseDto<CreateResponseDto>> {
-        return {data: 'Not implemented'};
+        const result = await this.dealRepository.update(id, dto);
+
+        if (!result.affected) {
+            throw new NotFoundException(`Сделка по ${id} не найдена для обновления`);
+        }
+
+        return {data: {id}};
     }
 
-    deleteById(id: string): Promise<void> {
-        return {data: 'Not implemented'};
+    async deleteById(id: string): Promise<void> {
+        const result = await this.dealRepository.delete(id);
+
+        if (!result.affected) {
+            throw new NotFoundException(`Сделка по ${id} не найдена для удаления`);
+        }
     }
 
     addSLALog() {
