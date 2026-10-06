@@ -57,17 +57,17 @@ export class Deal {
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
-    @ApiProperty({type: User})
+    @ApiProperty({type: () => User})
     @ManyToOne(() => User, (user) => user.deals)
     @JoinColumn({name: 'manager_id'})
     manager: User;
 
-    @ApiProperty({type: Company})
+    @ApiProperty({type: () => Company})
     @ManyToOne(() => Company, (company) => company.deals)
     @JoinColumn({name: 'company_id'})
     company: Company;
 
-    @ApiProperty({type: Customer})
+    @ApiProperty({type: () => Customer})
     @ManyToOne(() => Customer, (customer) => customer.deals)
     @JoinColumn({name: 'customer_id'})
     customer: Customer;

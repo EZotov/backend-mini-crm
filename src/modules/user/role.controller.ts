@@ -1,7 +1,9 @@
 import {Body, Controller, Delete, Param, Post, Put} from '@nestjs/common';
-import {ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
+import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {CreateResponseDto} from '@dto/index';
+import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {CreateRoleDto} from './dto/role.dto';
 import {UserService} from './user.service';
@@ -12,23 +14,22 @@ export class RoleController {
     constructor(private readonly userService: UserService) {}
 
     @ApiOperation({summary: 'Создать роль'})
-    @ApiOkResponse({type: CreateResponseDto})
+    @ApiOkModifyResponse(CreateResponseDto)
     @Post()
     createRole(@Body() createDto: CreateRoleDto) {
         return this.userService.createRole(createDto);
     }
 
     @ApiOperation({summary: 'Изменить роль'})
-    @ApiOkResponse({type: CreateResponseDto})
+    @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
-    updateRole(@Param('id') id: string, @Body() updateDto: CreateRoleDto) {
+    updateRole(@Param('id', ParseUUIDModifyPipe) id: string, @Body() updateDto: CreateRoleDto) {
         return this.userService.updateRoleById(id, updateDto);
     }
 
     @ApiOperation({summary: 'Удалить роль'})
-    @ApiOkResponse()
     @Delete(':id')
-    deleteRole(@Param('id') id: string) {
+    deleteRole(@Param('id', ParseUUIDModifyPipe) id: string) {
         return this.userService.removeRoleById(id);
     }
 }

@@ -1,12 +1,13 @@
 import {Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Put, Query} from '@nestjs/common';
-import {ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
 import {ROLES} from '@consts/index';
+import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {UserTokenData} from '@decorators/user-auth-data.decorator';
+import {CreateResponseDto} from '@dto/index';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
-import {UpdateUserDto} from './dto/user.dto';
-import {User} from './entities/user.entity';
+import {UpdateUserDto, UserDto} from './dto/user.dto';
 import {UserService} from './user.service';
 
 @ApiTags('Пользователи')
@@ -15,27 +16,29 @@ export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @ApiOperation({summary: 'Получить всех пользователей'})
+    @ApiOkModifyResponse(UserDto, {isArray: true})
     @Get()
     getAllUsers(@Query('pageNum', ParseIntPipe) pageNum: number, @Query('pageSize', ParseIntPipe) pageSize: number) {
         return this.userService.getUsersList(pageNum, pageSize);
     }
 
     @ApiOperation({summary: 'Получить профиль пользователя'})
-    @ApiOkResponse({type: User})
+    @ApiOkModifyResponse(UserDto)
     @Get(':id')
     getUser(@Param('id', ParseUUIDModifyPipe) userId: string) {
         return this.userService.getUserById(userId);
     }
 
     @ApiOperation({summary: 'Изменить данные чужого профиля'})
+    @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
-    updateUserProfile(@Param('id') userId: string, updateDto: UpdateUserDto) {
+    updateUserProfile(@Param('id', ParseUUIDModifyPipe) userId: string, updateDto: UpdateUserDto) {
         return this.userService.updateUserProfile(userId, updateDto);
     }
 
     @ApiOperation({summary: 'Удалить пользователя'})
     @Delete(':id')
-    deleteUser(@Param('id') userId: string, @UserTokenData('role') role: string) {
+    deleteUser(@Param('id', ParseUUIDModifyPipe) userId: string, @UserTokenData('role') role: string) {
         if (role !== ROLES.ADMIN) {
             throw new ForbiddenException('Не хватает прав доступа');
         }
@@ -56,13 +59,13 @@ export class MeUserController {
 
     @ApiOperation({summary: 'Изменить данные своего профиля'})
     @Put()
-    updateMyProfile(@UserTokenData('id') userId: string, updateDto: UpdateUserDto) {
+    updateMyProfile(@UserTokenData('id', ParseUUIDModifyPipe) userId: string, updateDto: UpdateUserDto) {
         return this.userService.updateUserProfile(userId, updateDto);
     }
 
     @ApiOperation({summary: 'Удалить свой аккаунт'})
     @Delete()
-    deleteMyAccount(@UserTokenData('id') userId: string) {
+    deleteMyAccount(@UserTokenData('id', ParseUUIDModifyPipe) userId: string) {
         return this.userService.removeUserById(userId);
     }
 }

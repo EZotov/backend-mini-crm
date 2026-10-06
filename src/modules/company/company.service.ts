@@ -3,7 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '@consts/index';
-import {CreateResponseDto} from '@dto/index';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {CreateCompanyDto} from './dto/company.dto';
@@ -13,7 +13,7 @@ import {Company} from './entities/company.entity';
 export class CompanyService {
     constructor(@InjectRepository(Company) private readonly companyRepository: Repository<Company>) {}
 
-    async getList(pageNum: number, pageSize: number) {
+    async getList(pageNum: number, pageSize: number): Promise<CollectionResponseDto<Company>> {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [companies, total] = await this.companyRepository.findAndCount({
@@ -28,28 +28,30 @@ export class CompanyService {
         };
     }
 
-    async getById(id: string): Promise<Company> {
+    async getById(id: string): Promise<ResponseDto<Company>> {
         const company = await this.companyRepository.findOne({where: {id}});
 
         if (!company) {
             throw new NotFoundException(`Компания с ID ${id} не найдена`);
         }
 
-        return company;
+        return {data: company};
     }
 
-    create(dto: CreateCompanyDto): Promise<CreateResponseDto> {
-        return this.companyRepository.save(dto);
+    async create(dto: CreateCompanyDto): Promise<ResponseDto<CreateResponseDto>> {
+        const company = await this.companyRepository.save(dto);
+
+        return {data: {id: company.id}};
     }
 
-    async updateById(id: string, dto: CreateCompanyDto): Promise<CreateResponseDto> {
+    async updateById(id: string, dto: CreateCompanyDto): Promise<ResponseDto<CreateResponseDto>> {
         const result = await this.companyRepository.update(id, dto);
 
         if (!result.affected) {
             throw new NotFoundException(`Компания с ID ${id} не найдена для обновления`);
         }
 
-        return {id};
+        return {data: {id}};
     }
 
     async deleteById(id: string): Promise<void> {
@@ -58,7 +60,5 @@ export class CompanyService {
         if (!result.affected) {
             throw new NotFoundException(`Компания с ID ${id} не найдена для удаления`);
         }
-
-        return;
     }
 }

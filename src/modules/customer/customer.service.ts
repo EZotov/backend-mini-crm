@@ -1,10 +1,10 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '~/consts';
-import {CollectionResponseDto, CreateResponseDto} from '~/dto';
-import {getOffsetAndCheckPaginationParams, isUUID} from '~/utils';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '~/dto';
+import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {CreateCustomerDto, CustomerDto} from './dto/customer.dto';
 import {Customer} from './entities/customer.entity';
@@ -28,34 +28,30 @@ export class CustomerService {
         };
     }
 
-    async getById(customerId: string): Promise<CustomerDto> {
-        if (!isUUID(customerId)) {
-            throw new BadRequestException('Передан некорректный формат UUID');
-        }
-
+    async getById(customerId: string): Promise<ResponseDto<CustomerDto>> {
         const customer = await this.customerRepository.findOneBy({id: customerId});
 
         if (!customer) {
             throw new NotFoundException('Заказчик не найден');
         }
 
-        return customer;
+        return {data: customer};
     }
 
-    async create(dto: CreateCustomerDto): Promise<CreateResponseDto> {
+    async create(dto: CreateCustomerDto): Promise<ResponseDto<CreateResponseDto>> {
         const result = await this.customerRepository.save(dto);
 
-        return {id: result.id};
+        return {data: {id: result.id}};
     }
 
-    async updateById(id: string, dto: CreateCustomerDto): Promise<{id: string}> {
+    async updateById(id: string, dto: CreateCustomerDto): Promise<ResponseDto<CreateResponseDto>> {
         const result = await this.customerRepository.update(id, {...dto, updatedAt: new Date()});
 
         if (!result.affected) {
             throw new NotFoundException(`Заказчик с ID ${id} не найден`);
         }
 
-        return {id};
+        return {data: {id}};
     }
 
     async removeById(customerId: string) {

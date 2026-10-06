@@ -58,7 +58,7 @@ export class User {
     @DeleteDateColumn({nullable: true, name: 'deleted_at'})
     deletedAt: Date;
 
-    @ApiProperty({type: Role, nullable: true})
+    @ApiProperty({type: () => Role, nullable: true})
     @OneToOne(() => Role, (role) => role.user, {nullable: true, onDelete: 'SET NULL'})
     @JoinColumn({name: 'role_id'})
     role: Role | null;
