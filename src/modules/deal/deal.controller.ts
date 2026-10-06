@@ -1,10 +1,11 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
+import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {DealService} from './deal.service';
-import {CreateDealDto, UpdateDealDto} from './dto/deal.dto';
+import {ChangeStatusDealDto, CreateDealDto, UpdateDealDto} from './dto/deal.dto';
 
 @ApiTags('Сделки')
 @Controller('deals')
@@ -30,9 +31,19 @@ export class DealController {
     }
 
     @ApiOperation({summary: 'Изменить сделку'})
-    @Patch(':id')
+    @Put(':id')
     update(@Param('id', ParseUUIDModifyPipe) id: string, @Body() dto: UpdateDealDto) {
         return this.dealService.updateById(id, dto);
+    }
+
+    @ApiOperation({summary: 'Изменить статус сделки'})
+    @Patch(':id')
+    changeStatus(
+        @Param('id', ParseUUIDModifyPipe) id: string,
+        @UserTokenData('id') managerId: string,
+        @Body() dto: ChangeStatusDealDto,
+    ) {
+        return this.dealService.updateStatusById(id, managerId, dto.status);
     }
 
     @ApiOperation({summary: 'Удалить сделку'})

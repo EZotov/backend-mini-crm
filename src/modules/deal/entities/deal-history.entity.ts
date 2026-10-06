@@ -1,5 +1,14 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {Exclude} from 'class-transformer';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
 import {User} from '~/modules/user/entities/user.entity';
 
@@ -25,12 +34,17 @@ export class DealHistory {
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
+    @Exclude()
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
+    @ApiProperty()
     @ManyToOne(() => Deal, (deal) => deal.history, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'deal_id'})
     deal: Deal;
 
+    @ApiProperty({nullable: true})
     @ManyToOne(() => User, {nullable: true, onDelete: 'SET NULL'})
+    @JoinColumn({name: 'manager_id'})
     changedBy: User | null;
 }

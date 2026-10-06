@@ -1,17 +1,22 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
+import {EntityManager, Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '@consts/index';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
-import {CreateDealDto, UpdateDealDto} from './dto/deal.dto';
+import {CreateDealDto, CreateSLALogDto, UpdateDealDto} from './dto/deal.dto';
 import {Deal} from './entities/deal.entity';
+import {DealHistory} from './entities/deal-history.entity';
+import {DealStatus} from './types';
 
 @Injectable()
 export class DealService {
-    constructor(@InjectRepository(Deal) private readonly dealRepository: Repository<Deal>) {}
+    constructor(
+        @InjectRepository(Deal) private readonly dealRepository: Repository<Deal>,
+        @InjectRepository(DealHistory) private readonly dealHistoryRepository: Repository<DealHistory>,
+    ) {}
 
     async getList(pageNum: number, pageSize: number): Promise<CollectionResponseDto<Deal>> {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
@@ -39,7 +44,7 @@ export class DealService {
     }
 
     async create(dto: CreateDealDto): Promise<ResponseDto<CreateResponseDto>> {
-        const result = await this.dealRepository.save({...dto});
+        const result = await this.dealRepository.save(dto);
 
         return {data: {id: result.id}};
     }
@@ -54,6 +59,37 @@ export class DealService {
         return {data: {id}};
     }
 
+    async updateStatusById(id: string, managerId: string, status: DealStatus): Promise<ResponseDto<CreateResponseDto>> {
+        return this.dealRepository.manager.transaction(async (entityManager) => {
+            const currentDeal = await entityManager.findOne(Deal, {
+                where: {id},
+                lock: {mode: 'pessimistic_write'},
+            });
+
+            if (!currentDeal) {
+                throw new NotFoundException(`Сделка не найдена`);
+            }
+
+            if (currentDeal.status === status) {
+                return {data: {id}};
+            }
+
+            await entityManager.update(Deal, id, {status});
+
+            await this.createSLALog(
+                {
+                    managerId,
+                    dealId: id,
+                    fromStatus: currentDeal.status,
+                    toStatus: status,
+                },
+                entityManager,
+            );
+
+            return {data: {id}};
+        });
+    }
+
     async deleteById(id: string): Promise<void> {
         const result = await this.dealRepository.delete(id);
 
@@ -62,7 +98,43 @@ export class DealService {
         }
     }
 
-    addSLALog() {
-        return {data: 'Not implemented'};
+    async getLogList(pageNum: number, pageSize: number): Promise<CollectionResponseDto<DealHistory>> {
+        const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
+
+        const [logs, total] = await this.dealHistoryRepository.findAndCount({
+            take: pageNum,
+            skip: skipCounts,
+            order: DEFAULT_ORDER,
+        });
+
+        return {
+            data: logs,
+            total,
+        };
+    }
+
+    async createSLALog(dto: CreateSLALogDto, entityManager?: EntityManager): Promise<ResponseDto<CreateResponseDto>> {
+        const {fromStatus, toStatus, dealId, managerId} = dto;
+
+        let result: DealHistory;
+
+        // Сделать лог в рамках транзакции извне
+        if (entityManager) {
+            result = await entityManager.save(DealHistory, {
+                fromStatus,
+                toStatus,
+                deal: {id: dealId},
+                changedBy: {id: managerId},
+            });
+        } else {
+            result = await this.dealHistoryRepository.save({
+                fromStatus,
+                toStatus,
+                deal: {id: dealId},
+                changedBy: {id: managerId},
+            });
+        }
+
+        return {data: {id: result.id}};
     }
 }
