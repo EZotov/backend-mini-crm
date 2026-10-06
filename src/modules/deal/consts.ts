@@ -9,3 +9,9 @@ export const DEAL_STATUS: Record<DealStatus, DealStatus> = {
     LOST: 'LOST',
     WON: 'WON',
 };
+
+export const DEAL_AVAILABLE_STATUS: Record<Exclude<DealStatus, 'LOST' | 'WON'>, DealStatus[]> = {
+    NEW: ['IN_PROGRESS', 'LOST'],
+    IN_PROGRESS: ['INVOICE', 'WON', 'LOST'],
+    INVOICE: ['WON', 'LOST', 'IN_PROGRESS'],
+};

@@ -1,4 +1,4 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {EntityManager, Repository} from 'typeorm';
 
@@ -6,6 +6,7 @@ import {DEFAULT_ORDER} from '@consts/index';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
+import {DEAL_AVAILABLE_STATUS} from './consts';
 import {CreateDealDto, CreateSLALogDto, UpdateDealDto} from './dto/deal.dto';
 import {Deal} from './entities/deal.entity';
 import {DealHistory} from './entities/deal-history.entity';
@@ -74,6 +75,10 @@ export class DealService {
                 return {data: {id}};
             }
 
+            if (!this.isValidStatusTransition(currentDeal.status, status)) {
+                throw new BadRequestException(`Невозможный переход из статуса ${currentDeal.status} в ${status}`);
+            }
+
             await entityManager.update(Deal, id, {status});
 
             await this.createSLALog(
@@ -136,5 +141,9 @@ export class DealService {
         }
 
         return {data: {id: result.id}};
+    }
+
+    isValidStatusTransition(fromStatus: DealStatus, toStatus: DealStatus) {
+        return DEAL_AVAILABLE_STATUS[fromStatus].includes(toStatus);
     }
 }
