@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsNumber, IsString} from 'class-validator';
+import {IsArray, IsNumber, IsString} from 'class-validator';
 
 import {CodeType} from '@interfaces/errors.interface';
 
@@ -14,18 +14,31 @@ export class PaginationDto {
 }
 
 export class CreateResponseDto {
+    constructor(partial: Partial<CreateResponseDto>) {
+        Object.assign(this, partial);
+    }
+
     @ApiProperty()
     @IsString()
     id: string;
 }
 
 export class ResponseDto<T> {
+    constructor(partial: Partial<ResponseDto<T>>) {
+        Object.assign(this, partial);
+    }
+
     @ApiProperty()
     data: T;
 }
 
 export class CollectionResponseDto<T> {
+    constructor(partial: Partial<CollectionResponseDto<T>>) {
+        Object.assign(this, partial);
+    }
+
     @ApiProperty()
+    @IsArray()
     data: T[];
 
     @ApiProperty()

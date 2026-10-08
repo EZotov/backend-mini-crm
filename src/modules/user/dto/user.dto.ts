@@ -1,4 +1,5 @@
 import {ApiProperty, OmitType, PickType} from '@nestjs/swagger';
+import {Transform} from 'class-transformer';
 
 import {User} from '../entities/user.entity';
 
@@ -13,6 +14,7 @@ export class UserDto extends OmitType(User, [
     'password',
     'role',
 ]) {
-    @ApiProperty()
-    role: string;
+    @ApiProperty({description: 'Название роли пользователя'})
+    @Transform(({obj}: {obj: User}) => obj.role?.title || null)
+    role: string | null;
 }

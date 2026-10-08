@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} fr
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
-import {CreateResponseDto} from '@dto/index';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {CompanyService} from './company.service';
@@ -17,34 +17,55 @@ export class CompanyController {
     @ApiOperation({summary: 'Получить список компаний'})
     @ApiOkModifyResponse(Company, {isArray: true})
     @Get()
-    getAll(@Query('pageNum', ParseIntPipe) pageNum: number, @Query('pageSize', ParseIntPipe) pageSize: number) {
-        return this.companyService.getList(pageNum, pageSize);
+    async getAll(
+        @Query('pageNum', ParseIntPipe) pageNum: number,
+        @Query('pageSize', ParseIntPipe) pageSize: number,
+    ): Promise<CollectionResponseDto<Company>> {
+        const {companies, total} = await this.companyService.getList(pageNum, pageSize);
+
+        return {
+            data: companies,
+            total,
+        };
     }
 
     @ApiOperation({summary: 'Получить компанию'})
     @ApiOkModifyResponse(Company)
     @Get(':id')
-    get(@Param('id', ParseUUIDModifyPipe) id: string) {
-        return this.companyService.getById(id);
+    async get(@Param('id', ParseUUIDModifyPipe) id: string): Promise<ResponseDto<Company>> {
+        const company = await this.companyService.getById(id);
+
+        return new ResponseDto({data: company});
     }
 
     @ApiOperation({summary: 'Создать новую компанию'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    create(@Body() dto: CreateCompanyDto) {
-        return this.companyService.create(dto);
+    async create(@Body() dto: CreateCompanyDto): Promise<ResponseDto<CreateResponseDto>> {
+        const createdId = await this.companyService.create(dto);
+
+        return new ResponseDto<CreateResponseDto>({
+            data: new CreateResponseDto({id: createdId}),
+        });
     }
 
     @ApiOperation({summary: 'Обновить информацию о компании'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
-    update(@Param('id', ParseUUIDModifyPipe) id: string, @Body() dto: CreateCompanyDto) {
-        return this.companyService.updateById(id, dto);
+    async update(
+        @Param('id', ParseUUIDModifyPipe) id: string,
+        @Body() dto: CreateCompanyDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        await this.companyService.updateById(id, dto);
+
+        return new ResponseDto<CreateResponseDto>({
+            data: new CreateResponseDto({id}),
+        });
     }
 
     @ApiOperation({summary: 'Удалить компанию'})
     @Delete(':id')
-    delete(@Param('id', ParseUUIDModifyPipe) id: string) {
-        this.companyService.deleteById(id);
+    delete(@Param('id', ParseUUIDModifyPipe) id: string): Promise<void> {
+        return this.companyService.deleteById(id);
     }
 }

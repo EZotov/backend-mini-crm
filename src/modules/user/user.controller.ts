@@ -1,10 +1,11 @@
 import {Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
+import {plainToInstance} from 'class-transformer';
 
 import {ROLES} from '@consts/index';
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {UserTokenData} from '@decorators/user-auth-data.decorator';
-import {CreateResponseDto} from '@dto/index';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {UpdateUserDto, UserDto} from './dto/user.dto';
@@ -18,27 +19,46 @@ export class UserController {
     @ApiOperation({summary: 'Получить всех пользователей'})
     @ApiOkModifyResponse(UserDto, {isArray: true})
     @Get()
-    getAllUsers(@Query('pageNum', ParseIntPipe) pageNum: number, @Query('pageSize', ParseIntPipe) pageSize: number) {
-        return this.userService.getUsersList(pageNum, pageSize);
+    async getAll(
+        @Query('pageNum', ParseIntPipe) pageNum: number,
+        @Query('pageSize', ParseIntPipe) pageSize: number,
+    ): Promise<CollectionResponseDto<UserDto>> {
+        const {users, total} = await this.userService.getUsersList(pageNum, pageSize);
+
+        return new CollectionResponseDto<UserDto>({
+            data: users.map((user) => plainToInstance(UserDto, user)),
+            total,
+        });
     }
 
     @ApiOperation({summary: 'Получить профиль пользователя'})
     @ApiOkModifyResponse(UserDto)
     @Get(':id')
-    getUser(@Param('id', ParseUUIDModifyPipe) userId: string) {
-        return this.userService.getUserById(userId);
+    async getUser(@Param('id', ParseUUIDModifyPipe) userId: string): Promise<ResponseDto<UserDto>> {
+        const user = await this.userService.getUserById(userId);
+
+        return new ResponseDto({
+            data: plainToInstance(UserDto, user),
+        });
     }
 
     @ApiOperation({summary: 'Изменить данные чужого профиля'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
-    updateUserProfile(@Param('id', ParseUUIDModifyPipe) userId: string, updateDto: UpdateUserDto) {
-        return this.userService.updateUserProfile(userId, updateDto);
+    async updateUserProfile(
+        @Param('id', ParseUUIDModifyPipe) userId: string,
+        updateDto: UpdateUserDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        await this.userService.updateUserProfile(userId, updateDto);
+
+        return new ResponseDto<CreateResponseDto>({
+            data: new CreateResponseDto({id: userId}),
+        });
     }
 
     @ApiOperation({summary: 'Удалить пользователя'})
     @Delete(':id')
-    deleteUser(@Param('id', ParseUUIDModifyPipe) userId: string, @UserTokenData('role') role: string) {
+    deleteUser(@Param('id', ParseUUIDModifyPipe) userId: string, @UserTokenData('role') role: string): Promise<void> {
         if (role !== ROLES.ADMIN) {
             throw new ForbiddenException('Не хватает прав доступа');
         }
@@ -51,21 +71,35 @@ export class UserController {
 @Controller('users/me')
 export class MeUserController {
     constructor(private readonly userService: UserService) {}
+
     @ApiOperation({summary: 'Получить свой профиль по токену'})
+    @ApiOkModifyResponse(UserDto)
     @Get()
-    me(@UserTokenData('id', ParseUUIDModifyPipe) id: string) {
-        return this.userService.getUserById(id);
+    async me(@UserTokenData('id', ParseUUIDModifyPipe) id: string): Promise<ResponseDto<UserDto>> {
+        const user = await this.userService.getUserById(id);
+
+        return new ResponseDto({
+            data: plainToInstance(UserDto, user),
+        });
     }
 
     @ApiOperation({summary: 'Изменить данные своего профиля'})
+    @ApiOkModifyResponse(CreateResponseDto)
     @Put()
-    updateMyProfile(@UserTokenData('id', ParseUUIDModifyPipe) userId: string, updateDto: UpdateUserDto) {
-        return this.userService.updateUserProfile(userId, updateDto);
+    async updateMyProfile(
+        @UserTokenData('id', ParseUUIDModifyPipe) userId: string,
+        updateDto: UpdateUserDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        await this.userService.updateUserProfile(userId, updateDto);
+
+        return new ResponseDto({
+            data: new CreateResponseDto({id: userId}),
+        });
     }
 
     @ApiOperation({summary: 'Удалить свой аккаунт'})
     @Delete()
-    deleteMyAccount(@UserTokenData('id', ParseUUIDModifyPipe) userId: string) {
+    deleteMyAccount(@UserTokenData('id', ParseUUIDModifyPipe) userId: string): Promise<void> {
         return this.userService.removeUserById(userId);
     }
 }

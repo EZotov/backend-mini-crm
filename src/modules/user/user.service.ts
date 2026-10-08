@@ -4,7 +4,6 @@ import {hash} from 'bcrypt';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER, PASSWORD_SALT} from '~/consts';
-import {CollectionResponseDto, CreateResponseDto} from '~/dto';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {CreateRoleDto} from './dto/role.dto';
@@ -26,16 +25,17 @@ export class UserService {
             take: pageSize,
             skip: skipCounts,
             order: DEFAULT_ORDER,
+            relations: {role: true},
         });
 
         return {
-            data: users,
+            users,
             total,
         };
     }
 
-    async getUserById(id: string) {
-        const user = await this.userRepository.findOneBy({id});
+    async getUserById(id: string): Promise<User> {
+        const user = await this.userRepository.findOne({where: {id}, relations: {role: true}});
 
         if (!user) {
             throw new NotFoundException('Пользователь не найден');
@@ -44,25 +44,25 @@ export class UserService {
         return user;
     }
 
-    async createUser(createDto: CreateUserDto): Promise<User> {
+    async createUser(createDto: CreateUserDto): Promise<string> {
         const {password} = createDto;
 
         const hashedPassword = await hash(password, PASSWORD_SALT);
         const createdUser = await this.userRepository.save({...createDto, password: hashedPassword});
 
-        return createdUser;
+        return createdUser.id;
     }
 
     // TODO: завести метод обновления пароля
 
-    async updateUserProfile(userId: string, updateDto: UpdateUserDto): Promise<CreateResponseDto> {
+    async updateUserProfile(userId: string, updateDto: UpdateUserDto): Promise<string> {
         const result = await this.userRepository.update(userId, updateDto);
 
         if (!result.affected) {
             throw new NotFoundException('Пользователь не найден');
         }
 
-        return {id: userId};
+        return userId;
     }
 
     async removeUserById(id: string): Promise<void> {
@@ -74,32 +74,32 @@ export class UserService {
     }
 
     // Roles
-    async getRolesList(): Promise<CollectionResponseDto<Role>> {
+    async getRolesList() {
         const [list, total] = await this.roleRepository.findAndCount({order: DEFAULT_ORDER});
 
         return {
-            data: list,
+            list,
             total,
         };
     }
 
-    async createRole(createDto: CreateRoleDto): Promise<CreateResponseDto> {
+    async createRole(createDto: CreateRoleDto): Promise<string> {
         const result = await this.roleRepository.save(createDto);
 
-        return {id: result.id};
+        return result.id;
     }
 
-    async updateRoleById(id: string, updateDto: CreateRoleDto): Promise<CreateResponseDto> {
+    async updateRoleById(id: string, updateDto: CreateRoleDto): Promise<string> {
         const result = await this.roleRepository.update(id, updateDto);
 
         if (!result.affected) {
             throw new NotFoundException('Роль не найдена');
         }
 
-        return {id};
+        return id;
     }
 
-    async removeRoleById(id: string) {
+    async removeRoleById(id: string): Promise<void> {
         const result = await this.roleRepository.delete({id});
 
         if (!result.affected) {

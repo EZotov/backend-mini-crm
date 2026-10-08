@@ -1,5 +1,9 @@
 import {ApiProperty, OmitType, PickType} from '@nestjs/swagger';
+import {Type} from 'class-transformer';
 import {IsNotEmpty, IsOptional, IsString, IsUUID} from 'class-validator';
+
+import {CustomerDto} from '~/modules/customer/dto/customer.dto';
+import {UserDto} from '~/modules/user/dto/user.dto';
 
 import {Deal} from '../entities/deal.entity';
 import type {DealStatus} from '../types';
@@ -37,6 +41,15 @@ export class CreateDealDto extends OmitType(Deal, [
     @IsUUID()
     @IsNotEmpty()
     customerId: string;
+}
+export class DealDto extends OmitType(Deal, ['createdAt', 'updatedAt', 'manager', 'customer']) {
+    @ApiProperty({type: () => UserDto})
+    @Type(() => UserDto)
+    manager: UserDto;
+
+    @ApiProperty({type: () => CustomerDto})
+    @Type(() => CustomerDto)
+    customer: CustomerDto;
 }
 
 export class UpdateDealDto extends CreateDealDto {}

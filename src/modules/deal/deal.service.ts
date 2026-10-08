@@ -3,7 +3,6 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {EntityManager, Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '@consts/index';
-import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {DEAL_AVAILABLE_STATUS} from './consts';
@@ -19,7 +18,7 @@ export class DealService {
         @InjectRepository(DealHistory) private readonly dealHistoryRepository: Repository<DealHistory>,
     ) {}
 
-    async getList(pageNum: number, pageSize: number): Promise<CollectionResponseDto<Deal>> {
+    async getList(pageNum: number, pageSize: number) {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [deals, total] = await this.dealRepository.findAndCount({
@@ -29,38 +28,38 @@ export class DealService {
         });
 
         return {
-            data: deals,
+            deals,
             total,
         };
     }
 
-    async getById(id: string): Promise<ResponseDto<Deal>> {
+    async getById(id: string): Promise<Deal> {
         const deal = await this.dealRepository.findOne({where: {id}});
 
         if (!deal) {
             throw new NotFoundException(`Сделка по ${id} не найдена`);
         }
 
-        return {data: deal};
+        return deal;
     }
 
-    async create(dto: CreateDealDto): Promise<ResponseDto<CreateResponseDto>> {
+    async create(dto: CreateDealDto): Promise<string> {
         const result = await this.dealRepository.save(dto);
 
-        return {data: {id: result.id}};
+        return result.id;
     }
 
-    async updateById(id: string, dto: UpdateDealDto): Promise<ResponseDto<CreateResponseDto>> {
+    async updateById(id: string, dto: UpdateDealDto): Promise<string> {
         const result = await this.dealRepository.update(id, dto);
 
         if (!result.affected) {
             throw new NotFoundException(`Сделка по ${id} не найдена для обновления`);
         }
 
-        return {data: {id}};
+        return id;
     }
 
-    async updateStatusById(id: string, managerId: string, status: DealStatus): Promise<ResponseDto<CreateResponseDto>> {
+    async updateStatusById(id: string, managerId: string, status: DealStatus): Promise<string> {
         return this.dealRepository.manager.transaction(async (entityManager) => {
             const currentDeal = await entityManager.findOne(Deal, {
                 where: {id},
@@ -72,7 +71,7 @@ export class DealService {
             }
 
             if (currentDeal.status === status) {
-                return {data: {id}};
+                return id;
             }
 
             if (!this.isValidStatusTransition(currentDeal.status, status)) {
@@ -91,7 +90,7 @@ export class DealService {
                 entityManager,
             );
 
-            return {data: {id}};
+            return id;
         });
     }
 
@@ -103,7 +102,7 @@ export class DealService {
         }
     }
 
-    async getLogList(pageNum: number, pageSize: number): Promise<CollectionResponseDto<DealHistory>> {
+    async getLogList(pageNum: number, pageSize: number) {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [logs, total] = await this.dealHistoryRepository.findAndCount({
@@ -113,12 +112,12 @@ export class DealService {
         });
 
         return {
-            data: logs,
+            logs,
             total,
         };
     }
 
-    async createSLALog(dto: CreateSLALogDto, entityManager?: EntityManager): Promise<ResponseDto<CreateResponseDto>> {
+    async createSLALog(dto: CreateSLALogDto, entityManager?: EntityManager): Promise<string> {
         const {fromStatus, toStatus, dealId, managerId} = dto;
 
         let result: DealHistory;
@@ -140,7 +139,7 @@ export class DealService {
             });
         }
 
-        return {data: {id: result.id}};
+        return result.id;
     }
 
     isValidStatusTransition(fromStatus: DealStatus, toStatus: DealStatus) {

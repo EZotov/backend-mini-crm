@@ -48,7 +48,6 @@ export class Customer {
     @OneToMany(() => Deal, (deal) => deal.customer)
     deals: Deal[];
 
-    @ApiProperty({type: () => Company})
     @ManyToOne(() => Company, (company) => company.contacts)
     @JoinColumn({name: 'company_id'})
     company: Company;

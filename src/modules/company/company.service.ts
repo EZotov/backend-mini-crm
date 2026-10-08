@@ -3,7 +3,6 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '@consts/index';
-import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {CreateCompanyDto} from './dto/company.dto';
@@ -13,7 +12,7 @@ import {Company} from './entities/company.entity';
 export class CompanyService {
     constructor(@InjectRepository(Company) private readonly companyRepository: Repository<Company>) {}
 
-    async getList(pageNum: number, pageSize: number): Promise<CollectionResponseDto<Company>> {
+    async getList(pageNum: number, pageSize: number) {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [companies, total] = await this.companyRepository.findAndCount({
@@ -23,35 +22,35 @@ export class CompanyService {
         });
 
         return {
-            data: companies,
+            companies,
             total,
         };
     }
 
-    async getById(id: string): Promise<ResponseDto<Company>> {
+    async getById(id: string): Promise<Company> {
         const company = await this.companyRepository.findOne({where: {id}});
 
         if (!company) {
             throw new NotFoundException(`Компания с ID ${id} не найдена`);
         }
 
-        return {data: company};
+        return company;
     }
 
-    async create(dto: CreateCompanyDto): Promise<ResponseDto<CreateResponseDto>> {
+    async create(dto: CreateCompanyDto): Promise<string> {
         const company = await this.companyRepository.save(dto);
 
-        return {data: {id: company.id}};
+        return company.id;
     }
 
-    async updateById(id: string, dto: CreateCompanyDto): Promise<ResponseDto<CreateResponseDto>> {
+    async updateById(id: string, dto: CreateCompanyDto): Promise<string> {
         const result = await this.companyRepository.update(id, dto);
 
         if (!result.affected) {
             throw new NotFoundException(`Компания с ID ${id} не найдена для обновления`);
         }
 
-        return {data: {id}};
+        return id;
     }
 
     async deleteById(id: string): Promise<void> {
