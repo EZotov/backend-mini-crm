@@ -1,5 +1,6 @@
 import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
+import {plainToInstance} from 'class-transformer';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '~/dto';
@@ -23,7 +24,7 @@ export class CustomerController {
         const {customers, totalCounts} = await this.customerService.getList(pageNum, pageSize);
 
         return new CollectionResponseDto({
-            data: customers,
+            data: customers.map((customer) => plainToInstance(CustomerDto, customer)),
             total: totalCounts,
         });
     }
@@ -34,7 +35,7 @@ export class CustomerController {
     async get(@Param('id', ParseUUIDModifyPipe) id: string): Promise<ResponseDto<CustomerDto>> {
         const customer = await this.customerService.getById(id);
 
-        return new ResponseDto({data: customer});
+        return new ResponseDto({data: plainToInstance(CustomerDto, customer)});
     }
 
     @ApiOperation({summary: 'Создать нового заказчика'})
