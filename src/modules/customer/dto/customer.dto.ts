@@ -3,7 +3,7 @@ import {IsMobilePhone, IsString} from 'class-validator';
 
 import {Customer} from '../entities/customer.entity';
 
-export class CustomerDto extends OmitType(Customer, ['updatedAt', 'deals', 'company']) {}
+export class CustomerDto extends OmitType(Customer, ['updatedAt', 'createdAt', 'deals', 'company']) {}
 
 export class CreateCustomerDto {
     @ApiProperty()

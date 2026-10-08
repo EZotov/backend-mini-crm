@@ -13,8 +13,8 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import {Activity} from '~/modules/activites/entities/activites.entity';
-import {SlaLog} from '~/modules/activites/entities/sla.entity';
+import {Activity} from '~/modules/activity/entities/activity.entity';
+import {SlaLog} from '~/modules/activity/entities/sla.entity';
 import {Deal} from '~/modules/deal/entities/deal.entity';
 
 import {Role} from './role.entity';

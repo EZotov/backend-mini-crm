@@ -11,8 +11,8 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import {Activity} from '~/modules/activites/entities/activites.entity';
-import {SlaLog} from '~/modules/activites/entities/sla.entity';
+import {Activity} from '~/modules/activity/entities/activity.entity';
+import {SlaLog} from '~/modules/activity/entities/sla.entity';
 import {Company} from '~/modules/company/entities/company.entity';
 import {Customer} from '~/modules/customer/entities/customer.entity';
 import {User} from '~/modules/user/entities/user.entity';

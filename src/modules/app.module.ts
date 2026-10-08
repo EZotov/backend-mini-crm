@@ -3,6 +3,7 @@ import {ConfigModule} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
 
 import getDBConfig from '../configs/db/options';
+import {ActivityModule} from './activity/activity.module';
 import {AnalyticsModule} from './analytics/analytics.module';
 import {AuthModule} from './auth/auth.module';
 import {CompanyModule} from './company/company.module';
@@ -22,6 +23,7 @@ import {UserModule} from './user/user.module';
         CustomerModule,
         UserModule,
         AuthModule,
+        ActivityModule,
         AnalyticsModule,
         DealModule,
         NotificationModule,
