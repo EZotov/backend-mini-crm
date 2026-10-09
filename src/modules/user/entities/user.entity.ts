@@ -1,5 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Exclude} from 'class-transformer';
+import {IsEmail} from 'class-validator';
 import {
     Column,
     CreateDateColumn,
@@ -27,6 +28,7 @@ export class User {
     id: string;
 
     @ApiProperty()
+    @IsEmail(undefined, {message: 'Некорректный формат почты'})
     @Column()
     email: string;
 

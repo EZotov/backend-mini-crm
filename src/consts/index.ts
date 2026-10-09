@@ -11,3 +11,7 @@ export const ROLES = {
     ADMIN: 'ADMIN',
     USER: 'USER',
 } as const;
+
+export const REG_EXP = {
+    PASSWORD: /^[a-zA-Z0-9]+$/,
+};

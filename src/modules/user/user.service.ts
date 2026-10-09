@@ -1,13 +1,14 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {hash} from 'bcrypt';
+import {compare, hash} from 'bcrypt';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER, PASSWORD_SALT} from '~/consts';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
+import {LoginRequestDto} from '../auth/dto/auth.dto';
 import {CreateRoleDto} from './dto/role.dto';
-import {CreateUserDto, UpdateUserDto} from './dto/user.dto';
+import {CreateUserDto, UpdatePasswordDto, UpdateUserDto} from './dto/user.dto';
 import {Role} from './entities/role.entity';
 import {User} from './entities/user.entity';
 
@@ -44,16 +45,55 @@ export class UserService {
         return user;
     }
 
+    async getUserByCredentials(dto: LoginRequestDto): Promise<User> {
+        const {email, password} = dto;
+
+        const user = await this.userRepository.findOne({where: {email}, relations: {role: true}});
+
+        const isPasswordValid = await compare(password, user?.password ?? '');
+
+        if (!user || !isPasswordValid) {
+            throw new NotFoundException('Почта или пароль не верны');
+        }
+
+        return user;
+    }
+
     async createUser(createDto: CreateUserDto): Promise<string> {
-        const {password} = createDto;
+        const {password, confirmPassword, ...dto} = createDto;
+
+        if (!password || !confirmPassword) {
+            throw new BadRequestException('Один или оба пароля пусты');
+        }
+
+        if (password !== confirmPassword) {
+            throw new BadRequestException('Пароли не совпадают');
+        }
 
         const hashedPassword = await hash(password, PASSWORD_SALT);
-        const createdUser = await this.userRepository.save({...createDto, password: hashedPassword});
+
+        const createdUser = await this.userRepository.save({...dto, password: hashedPassword});
 
         return createdUser.id;
     }
 
-    // TODO: завести метод обновления пароля
+    async updatePassword(userId: string, dto: UpdatePasswordDto) {
+        if (!dto.newPassword || !dto.confirmPassword) {
+            throw new BadRequestException('Один или оба пароля пусты');
+        }
+
+        if (dto.newPassword !== dto.confirmPassword) {
+            throw new BadRequestException('Пароли не совпадают');
+        }
+
+        const hashedPassword = await hash(dto.newPassword, PASSWORD_SALT);
+
+        const result = await this.userRepository.update(userId, {password: hashedPassword});
+
+        if (!result.affected) {
+            throw new NotFoundException('Пользователя не существует');
+        }
+    }
 
     async updateUserProfile(userId: string, updateDto: UpdateUserDto): Promise<string> {
         const result = await this.userRepository.update(userId, updateDto);

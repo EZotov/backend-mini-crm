@@ -20,24 +20,26 @@ export class ActivityController {
     getAll(
         @Query('pageNum', ParseIntPipe) pageNum: number,
         @Query('pageSize', ParseIntPipe) pageSize: number,
-    ): Promise<CollectionResponseDto<Activity>> {
+    ): CollectionResponseDto<Activity> {
         return {
             data: [],
-            total,
+            total: 0,
         };
     }
 
     @ApiOperation({summary: 'Получить задачу'})
     @ApiOkModifyResponse(Activity)
     @Get(':id')
-    get(@Param('id', ParseUUIDModifyPipe) id: string): Promise<ResponseDto<Activity>> {
-        return {};
+    get(@Param('id', ParseUUIDModifyPipe) id: string): ResponseDto<Activity> {
+        return new ResponseDto<Activity>({
+            data: {} as Activity,
+        });
     }
 
     @ApiOperation({summary: 'Создать новую задачу'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    async create(@Body() dto: CreateCompanyDto): Promise<ResponseDto<CreateResponseDto>> {
+    create(@Body() dto: CreateCompanyDto): ResponseDto<CreateResponseDto> {
         const createdId = '';
 
         return new ResponseDto<CreateResponseDto>({
@@ -51,7 +53,7 @@ export class ActivityController {
     update(
         @Param('id', ParseUUIDModifyPipe) id: string,
         @Body() dto: CreateCompanyDto,
-    ): Promise<ResponseDto<CreateResponseDto>> {
+    ): ResponseDto<CreateResponseDto> {
         return new ResponseDto<CreateResponseDto>({
             data: new CreateResponseDto({id}),
         });
@@ -59,7 +61,7 @@ export class ActivityController {
 
     @ApiOperation({summary: 'Удалить задачу'})
     @Delete(':id')
-    delete(@Param('id', ParseUUIDModifyPipe) id: string): Promise<void> {
-        return this.activityService.deleteById(id);
+    delete(@Param('id', ParseUUIDModifyPipe) id: string): void {
+        return;
     }
 }

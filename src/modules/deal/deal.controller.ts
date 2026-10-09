@@ -8,7 +8,7 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index'
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {DealService} from './deal.service';
-import {ChangeStatusDealDto, CreateDealDto, DealDto, UpdateDealDto} from './dto/deal.dto';
+import {ChangeStatusDealDto, CreateDealDto, DealDto} from './dto/deal.dto';
 import {Deal} from './entities/deal.entity';
 
 @ApiTags('Сделки')
@@ -58,7 +58,7 @@ export class DealController {
     @Put(':id')
     async update(
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @Body() dto: UpdateDealDto,
+        @Body() dto: CreateDealDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         await this.dealService.updateById(id, dto);
 

@@ -6,7 +6,7 @@ import {DEFAULT_ORDER} from '@consts/index';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {DEAL_AVAILABLE_STATUS} from './consts';
-import {CreateDealDto, CreateSLALogDto, UpdateDealDto} from './dto/deal.dto';
+import {CreateDealDto, CreateSLALogDto} from './dto/deal.dto';
 import {Deal} from './entities/deal.entity';
 import {DealHistory} from './entities/deal-history.entity';
 import {DealStatus} from './types';
@@ -49,7 +49,7 @@ export class DealService {
         return result.id;
     }
 
-    async updateById(id: string, dto: UpdateDealDto): Promise<string> {
+    async updateById(id: string, dto: CreateDealDto): Promise<string> {
         const result = await this.dealRepository.update(id, dto);
 
         if (!result.affected) {
