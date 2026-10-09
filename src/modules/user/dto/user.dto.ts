@@ -6,7 +6,10 @@ import {REG_EXP} from '@consts/index';
 
 import {User} from '../entities/user.entity';
 
-export class CreateUserDto extends PickType(User, ['firstName', 'patronymic', 'lastName', 'email']) {
+export class CreateUserDto extends PickType(User, ['firstName', 'lastName', 'email']) {
+    @ApiProperty({required: false})
+    patronymic?: string;
+
     @ApiProperty()
     @IsString()
     @Matches(REG_EXP.PASSWORD, {message: 'Неверный формат пароля'})

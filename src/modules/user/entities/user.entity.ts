@@ -40,9 +40,9 @@ export class User {
     @Column({name: 'first_name', nullable: true})
     firstName: string;
 
-    @ApiProperty()
-    @Column({nullable: true})
-    patronymic: string;
+    @ApiProperty({required: false, nullable: true})
+    @Column({type: 'varchar', nullable: true})
+    patronymic: string | null;
 
     @ApiProperty()
     @Column({name: 'last_name', nullable: true})

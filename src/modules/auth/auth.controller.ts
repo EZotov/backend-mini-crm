@@ -1,6 +1,7 @@
-import {Controller, Post} from '@nestjs/common';
+import {Body, Controller, Post} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
+import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {Cookie} from '@decorators/cookie.decorator';
 import {ResponseDto} from '@dto/index';
 
@@ -14,8 +15,9 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @ApiOperation({summary: 'Зарегистрировать нового пользователя'})
+    @ApiOkModifyResponse(LoginDto)
     @Post('sign-up')
-    async registration(dto: CreateUserDto): Promise<ResponseDto<LoginDto>> {
+    async registration(@Body() dto: CreateUserDto): Promise<ResponseDto<LoginDto>> {
         const tokens = await this.authService.registration(dto);
 
         return new ResponseDto({
@@ -24,8 +26,9 @@ export class AuthController {
     }
 
     @ApiOperation({summary: 'Войти в систему'})
+    @ApiOkModifyResponse(LoginDto)
     @Post('sign-in')
-    async login(dto: LoginRequestDto): Promise<ResponseDto<LoginDto>> {
+    async login(@Body() dto: LoginRequestDto): Promise<ResponseDto<LoginDto>> {
         const tokens = await this.authService.login(dto);
 
         return new ResponseDto({
@@ -34,6 +37,7 @@ export class AuthController {
     }
 
     @ApiOperation({summary: 'Обновить токен аутентификации'})
+    @ApiOkModifyResponse(RefreshTokenDto)
     @Post('refresh')
     async refresh(@Cookie('refreshToken') refreshToken: string): Promise<ResponseDto<RefreshTokenDto>> {
         const accessToken = await this.authService.generateAccessTokenByRefreshToken(refreshToken);
@@ -44,6 +48,7 @@ export class AuthController {
     }
 
     @ApiOperation({summary: 'Выйти из системы'})
+    @ApiOkModifyResponse()
     @Post('logout')
     logout(): ResponseDto<string> {
         return {data: 'Not implemented'};
