@@ -1,36 +1,65 @@
-import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '@nestjs/common';
+import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {AuthGuard, PassportStrategy} from '@nestjs/passport';
+import type {Request} from 'express';
+import {ExtractJwt, Strategy} from 'passport-jwt';
 
-import {AuthenticatedRequest, JwtPayload} from '@interfaces/auth.interface';
-
-const ACCESS_TOKEN_KEY = 'access_token';
+import {authError, JWT_ERRORS} from '@consts/errors';
+import {ACCESS_TOKEN_KEY} from '@consts/index';
+import {JwtPayload} from '@interfaces/auth.interface';
+import {UserService} from '~/modules/user/user.service';
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
-    // Внедряем встроенный JwtService из @nestjs/jwt
-    // constructor(private readonly jwtService: JwtService) {}
+export class JwtStrategy extends PassportStrategy(Strategy) {
+    constructor(
+        readonly configService: ConfigService,
+        private readonly userService: UserService,
+    ) {
+        super({
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                ExtractJwt.fromAuthHeaderAsBearerToken(),
+                (request: Request) => {
+                    return request?.cookies?.[ACCESS_TOKEN_KEY] || null;
+                },
+            ]),
+            secretOrKeyProvider: (_, __, done) => done(null, configService.get<string>('JWT_ACCESS_SECRET')),
+        });
+    }
 
-    canActivate(context: ExecutionContext): boolean {
-        const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-        const authHeader = request.headers?.authorization;
-
-        let token = (request.cookies?.[ACCESS_TOKEN_KEY] as string) || null;
-
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            token = authHeader.split(' ')[1];
+    async validate(payload: JwtPayload): Promise<JwtPayload> {
+        if (!payload) {
+            throw new UnauthorizedException('Невалидный токен');
         }
 
-        if (!token) {
-            throw new UnauthorizedException('Необходима аутентификация (токен отсутствует)');
+        const user = await this.userService.getUserById(payload.id);
+
+        if (!user) {
+            throw authError;
         }
 
-        try {
-            const payload = {} as JwtPayload;
-            request.user = payload;
-        } catch (error) {
-            console.error(error);
-            throw new UnauthorizedException('Неверный или просроченный токен');
+        return {id: user.id, email: user.email, role: user.role?.title};
+    }
+}
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+    handleRequest(error, user, info) {
+        if (error) {
+            throw error;
         }
 
-        return true;
+        if (info?.name === JWT_ERRORS.JWT_EXPIRED) {
+            throw new UnauthorizedException('Срок действия токена истек.');
+        }
+
+        if (info?.name === JWT_ERRORS.JWT_INVALID) {
+            throw new UnauthorizedException('Невалидный токен.');
+        }
+
+        if (!user) {
+            throw authError;
+        }
+
+        return user;
     }
 }

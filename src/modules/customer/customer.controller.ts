@@ -1,8 +1,9 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {JwtAuthGuard} from '@guards/auth.guard';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '~/dto';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
@@ -10,6 +11,7 @@ import {CustomerService} from './customer.service';
 import {CreateCustomerDto, CustomerDto} from './dto/customer.dto';
 
 @ApiTags('Заказчики')
+@UseGuards(JwtAuthGuard)
 @Controller('customers')
 export class CustomerController {
     constructor(private readonly customerService: CustomerService) {}

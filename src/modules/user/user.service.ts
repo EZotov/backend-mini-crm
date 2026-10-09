@@ -3,6 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {compare, hash} from 'bcrypt';
 import {Repository} from 'typeorm';
 
+import {loginError} from '@consts/errors';
 import {DEFAULT_ORDER, PASSWORD_SALT} from '~/consts';
 import {getOffsetAndCheckPaginationParams} from '~/utils';
 
@@ -53,7 +54,7 @@ export class UserService {
         const isPasswordValid = await compare(password, user?.password ?? '');
 
         if (!user || !isPasswordValid) {
-            throw new NotFoundException('Почта или пароль не верны');
+            throw loginError;
         }
 
         return user;

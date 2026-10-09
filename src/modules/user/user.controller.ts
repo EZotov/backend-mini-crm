@@ -1,4 +1,4 @@
-import {Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Put, Query} from '@nestjs/common';
+import {Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Put, Query, UseGuards} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
@@ -6,12 +6,14 @@ import {ROLES} from '@consts/index';
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
+import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {UpdateUserDto, UserDto} from './dto/user.dto';
 import {UserService} from './user.service';
 
 @ApiTags('Пользователи')
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
@@ -68,6 +70,7 @@ export class UserController {
 }
 
 @ApiTags('Мой профиль')
+@UseGuards(JwtAuthGuard)
 @Controller('users/me')
 export class MeUserController {
     constructor(private readonly userService: UserService) {}

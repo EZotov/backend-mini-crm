@@ -28,8 +28,8 @@ export class LoginDto {
     refreshToken: string;
 }
 
-export class RefreshTokenDto {
-    constructor(dto: Partial<RefreshTokenDto>) {
+export class RefreshAccessTokenDto {
+    constructor(dto: Partial<RefreshAccessTokenDto>) {
         Object.assign(this, dto);
     }
 

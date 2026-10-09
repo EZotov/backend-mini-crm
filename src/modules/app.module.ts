@@ -28,7 +28,7 @@ import {UserModule} from './user/user.module';
         DealModule,
         NotificationModule,
     ],
-    controllers: [],
     providers: [],
+    controllers: [],
 })
 export class AppModule {}

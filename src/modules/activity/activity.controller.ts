@@ -1,8 +1,9 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
+import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {CreateCompanyDto} from '../company/dto/company.dto';
@@ -10,6 +11,7 @@ import {ActivityService} from './activity.service';
 import {Activity} from './entities/activity.entity';
 
 @ApiTags('Задачи')
+@UseGuards(JwtAuthGuard)
 @Controller('activities')
 export class ActivityController {
     constructor(private readonly activityService: ActivityService) {}

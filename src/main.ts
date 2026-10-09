@@ -2,6 +2,7 @@ import {BadRequestException, ClassSerializerInterceptor, ValidationPipe} from '@
 import {ConfigService} from '@nestjs/config';
 import {NestFactory, Reflector} from '@nestjs/core';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 
 import {ExceptionsFilter} from './filters/errors.filter';
 import {AppModule} from './modules/app.module';
@@ -13,6 +14,8 @@ async function bootstrap() {
 
     const configService = app.get(ConfigService);
     const port = configService.get<number>('PORT') || 3001;
+
+    app.use(cookieParser());
 
     app.setGlobalPrefix(globalPrefix);
 
