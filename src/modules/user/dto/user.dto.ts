@@ -66,7 +66,6 @@ export class UpdatePasswordDto {
 
 export class UserDto {
     @ApiProperty()
-    @IsString()
     id: string;
 
     @ApiProperty()
@@ -74,14 +73,12 @@ export class UserDto {
     email: string;
 
     @ApiProperty()
-    @IsString()
     firstName: string;
 
     @ApiProperty({required: false, nullable: true})
     patronymic: string | null;
 
     @ApiProperty()
-    @IsString()
     lastName: string;
 
     @ApiProperty({type: 'string', required: false, nullable: true})

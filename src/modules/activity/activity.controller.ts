@@ -6,8 +6,8 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index'
 import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
-import {CreateCompanyDto} from '../company/dto/company.dto';
 import {ActivityService} from './activity.service';
+import {CreateOrUpdateActivityDto} from './dto/activity.dto';
 import {Activity} from './entities/activity.entity';
 
 @ApiTags('Задачи')
@@ -29,20 +29,11 @@ export class ActivityController {
         };
     }
 
-    @ApiOperation({summary: 'Получить задачу'})
-    @ApiOkModifyResponse(Activity)
-    @Get(':id')
-    get(@Param('id', ParseUUIDModifyPipe) id: string): ResponseDto<Activity> {
-        return new ResponseDto<Activity>({
-            data: {} as Activity,
-        });
-    }
-
     @ApiOperation({summary: 'Создать новую задачу'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    create(@Body() dto: CreateCompanyDto): ResponseDto<CreateResponseDto> {
-        const createdId = '';
+    async create(@Body() dto: CreateOrUpdateActivityDto): Promise<ResponseDto<CreateResponseDto>> {
+        const createdId = await this.activityService.create(dto);
 
         return new ResponseDto<CreateResponseDto>({
             data: new CreateResponseDto({id: createdId}),
@@ -52,18 +43,20 @@ export class ActivityController {
     @ApiOperation({summary: 'Обновить задачу'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
-    update(
+    async update(
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @Body() dto: CreateCompanyDto,
-    ): ResponseDto<CreateResponseDto> {
+        @Body() dto: CreateOrUpdateActivityDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        const updatedId = await this.activityService.updateById(id, dto);
+
         return new ResponseDto<CreateResponseDto>({
-            data: new CreateResponseDto({id}),
+            data: new CreateResponseDto({id: updatedId}),
         });
     }
 
     @ApiOperation({summary: 'Удалить задачу'})
     @Delete(':id')
-    delete(@Param('id', ParseUUIDModifyPipe) id: string): void {
-        return;
+    delete(@Param('id', ParseUUIDModifyPipe) id: string): Promise<void> {
+        return this.activityService.removeById(id);
     }
 }

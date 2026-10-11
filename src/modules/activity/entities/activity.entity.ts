@@ -16,8 +16,8 @@ import {Deal} from '~/modules/deal/entities/deal.entity';
 import {UserDto} from '~/modules/user/dto/user.dto';
 import {User} from '~/modules/user/entities/user.entity';
 
-import {ACTIVITY_ENUM} from '../consts';
-import type {ActivityType} from '../types';
+import {ACTIVITY_ENUM, ACTIVITY_STATUS, ACTIVITY_STATUS_ENUM} from '../consts';
+import type {ActivityStatus, ActivityType} from '../types';
 
 @Entity('activities')
 export class Activity {
@@ -33,13 +33,13 @@ export class Activity {
     @Column()
     description: string;
 
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'date-time'})
     @Column({type: 'timestamp'})
-    dueDate: Date; // Дедлайн выполнения задачи
+    dueDate: Date;
 
-    @ApiProperty({type: 'boolean'})
-    @Column({type: 'boolean', default: false})
-    isCompleted: boolean;
+    @ApiProperty({enum: ACTIVITY_STATUS_ENUM})
+    @Column({type: 'enum', enum: ACTIVITY_STATUS_ENUM, default: ACTIVITY_STATUS.NEW})
+    status: ActivityStatus;
 
     @Exclude()
     @CreateDateColumn({name: 'created_at'})
@@ -59,5 +59,5 @@ export class Activity {
     @Type(() => UserDto)
     @OneToOne(() => User, (user) => user.activities, {onDelete: 'CASCADE'})
     @JoinColumn({name: 'manager_id'})
-    manager: User; // Ответственный за задачу менеджер
+    manager: User;
 }

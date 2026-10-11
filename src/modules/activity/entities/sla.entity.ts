@@ -1,4 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {Exclude} from 'class-transformer';
 import {
     Column,
     CreateDateColumn,
@@ -25,10 +26,12 @@ export class SlaLog {
     minutesOverdue: number;
 
     @ApiProperty()
+    @Exclude()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
     @ApiProperty()
+    @Exclude()
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
@@ -37,7 +40,7 @@ export class SlaLog {
     @JoinColumn({name: 'deal_id'})
     deal: Deal;
 
-    @ApiProperty({type: UserDto})
+    @ApiProperty({type: UserDto, nullable: true})
     @ManyToOne(() => User, (user) => user.slaLogs, {nullable: true, onDelete: 'SET NULL'})
     @JoinColumn({name: 'manager_id'})
     manager: User | null;
