@@ -39,7 +39,7 @@ export class DealHistory {
     updatedAt: Date;
 
     @ApiProperty()
-    @ManyToOne(() => Deal, (deal) => deal.history, {onDelete: 'CASCADE'})
+    @ManyToOne(() => Deal, {onDelete: 'CASCADE'})
     @JoinColumn({name: 'deal_id'})
     deal: Deal;
 

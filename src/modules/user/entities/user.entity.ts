@@ -7,15 +7,10 @@ import {
     Entity,
     Index,
     JoinColumn,
-    OneToMany,
-    OneToOne,
+    ManyToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-
-import {Activity} from '~/modules/activity/entities/activity.entity';
-import {SlaLog} from '~/modules/activity/entities/sla.entity';
-import {Deal} from '~/modules/deal/entities/deal.entity';
 
 import {Role} from './role.entity';
 
@@ -59,16 +54,7 @@ export class User {
     deletedAt: Date;
 
     @ApiProperty({type: () => Role, nullable: true})
-    @OneToOne(() => Role, (role) => role.user, {nullable: true, onDelete: 'SET NULL'})
+    @ManyToOne(() => Role, {nullable: true, onDelete: 'SET NULL'})
     @JoinColumn({name: 'role_id'})
     role: Role | null;
-
-    @OneToMany(() => Deal, (deal) => deal.manager)
-    deals: Deal[];
-
-    @OneToMany(() => Activity, (activities) => activities.manager)
-    activities: Activity[];
-
-    @OneToMany(() => SlaLog, (logs) => logs.manager)
-    slaLogs: SlaLog[];
 }

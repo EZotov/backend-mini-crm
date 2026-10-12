@@ -36,12 +36,12 @@ export class SlaLog {
     updatedAt: Date;
 
     @ApiProperty({type: DealDto})
-    @ManyToOne(() => Deal, (deal) => deal.slaLogs, {onDelete: 'CASCADE'})
+    @ManyToOne(() => Deal, {onDelete: 'CASCADE'})
     @JoinColumn({name: 'deal_id'})
     deal: Deal;
 
     @ApiProperty({type: UserDto, nullable: true})
-    @ManyToOne(() => User, (user) => user.slaLogs, {nullable: true, onDelete: 'SET NULL'})
+    @ManyToOne(() => User, {nullable: true, onDelete: 'SET NULL'})
     @JoinColumn({name: 'manager_id'})
     manager: User | null;
 }

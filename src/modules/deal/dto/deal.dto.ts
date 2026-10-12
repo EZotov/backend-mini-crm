@@ -11,6 +11,14 @@ import type {DealStatus} from '../types';
 export class CreateDealDto {
     @ApiProperty({
         example: 'd3b07384-d113-4956-a5e2-aa59df3a8d9a',
+        description: 'UUID создателя (User)',
+    })
+    @IsUUID()
+    @IsNotEmpty()
+    createdById: string;
+
+    @ApiProperty({
+        example: 'd3b07384-d113-4956-a5e2-aa59df3a8d9a',
         description: 'UUID менеджера (User)',
     })
     @IsUUID()
@@ -35,18 +43,22 @@ export class CreateDealDto {
     customerId: string;
 
     @ApiProperty()
+    @IsNotEmpty()
     @IsString()
     title: string;
 
     @ApiProperty({type: 'number'})
+    @IsNotEmpty()
     @IsNumber()
     budget: number;
 
     @ApiProperty({type: 'string', format: 'date-time'})
+    @IsNotEmpty()
     @IsString()
     slaDeadline: string;
 
     @ApiProperty({type: 'boolean'})
+    @IsNotEmpty()
     @IsBoolean()
     isSlaViolated: boolean;
 }
@@ -74,6 +86,10 @@ export class DealDto {
     @Type(() => UserDto)
     manager: UserDto;
 
+    @ApiProperty({type: () => UserDto, description: 'Автор сделки'})
+    @Type(() => UserDto)
+    createdBy: UserDto;
+
     @ApiProperty({type: () => CustomerDto, description: 'Клиент сделки'})
     @Type(() => CustomerDto)
     customer: CustomerDto;
@@ -97,7 +113,7 @@ export class CreateSLALogDto {
 
     @ApiProperty()
     @IsUUID('4')
-    managerId: string;
+    createdById: string;
 
     @ApiProperty()
     @IsString()

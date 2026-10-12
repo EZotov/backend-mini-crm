@@ -51,13 +51,21 @@ export class Activity {
 
     @ApiProperty({type: DealDto})
     @Type(() => DealDto)
-    @ManyToOne(() => Deal, (deal) => deal.activities, {onDelete: 'CASCADE'})
+    @ManyToOne(() => Deal, {onDelete: 'CASCADE'})
     @JoinColumn({name: 'deal_id'})
     deal: Deal;
 
+    // На кого назначена
     @ApiProperty({type: UserDto})
     @Type(() => UserDto)
-    @OneToOne(() => User, (user) => user.activities, {onDelete: 'CASCADE'})
-    @JoinColumn({name: 'manager_id'})
-    manager: User;
+    @OneToOne(() => User, {onDelete: 'SET NULL'})
+    @JoinColumn({name: 'assigned_id'})
+    assigned: User;
+
+    // Тот кто создал
+    @ApiProperty({type: UserDto})
+    @Type(() => UserDto)
+    @OneToOne(() => User, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'created_by_id'})
+    createdBy: User;
 }

@@ -6,20 +6,16 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
 
-import {Activity} from '~/modules/activity/entities/activity.entity';
-import {SlaLog} from '~/modules/activity/entities/sla.entity';
 import {Company} from '~/modules/company/entities/company.entity';
 import {Customer} from '~/modules/customer/entities/customer.entity';
 import {User} from '~/modules/user/entities/user.entity';
 
 import {DEAL_STATUS, DEAL_STATUS_ENUM} from '../consts';
 import type {DealStatus} from '../types';
-import {DealHistory} from './deal-history.entity';
 
 @Entity({name: 'deals'})
 export class Deal {
@@ -48,36 +44,30 @@ export class Deal {
     isSlaViolated: boolean;
 
     @Exclude()
-    @ApiProperty()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
     @Exclude()
-    @ApiProperty()
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
     @ApiProperty({type: () => User})
-    @ManyToOne(() => User, (user) => user.deals)
+    @ManyToOne(() => User)
     @JoinColumn({name: 'manager_id'})
     manager: User;
 
+    @ApiProperty({type: () => User})
+    @ManyToOne(() => User)
+    @JoinColumn({name: 'created_by_id'})
+    createdBy: User;
+
     @ApiProperty({type: () => Company})
-    @ManyToOne(() => Company, (company) => company.deals)
+    @ManyToOne(() => Company)
     @JoinColumn({name: 'company_id'})
     company: Company;
 
     @ApiProperty({type: () => Customer})
-    @ManyToOne(() => Customer, (customer) => customer.deals)
+    @ManyToOne(() => Customer)
     @JoinColumn({name: 'customer_id'})
     customer: Customer;
-
-    @OneToMany(() => Activity, (activities) => activities.deal)
-    activities: Activity[];
-
-    @OneToMany(() => DealHistory, (dealHistory) => dealHistory.deal)
-    history: DealHistory[];
-
-    @OneToMany(() => SlaLog, (logs) => logs.deal)
-    slaLogs: SlaLog[];
 }

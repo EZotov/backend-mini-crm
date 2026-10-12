@@ -1,10 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Exclude} from 'class-transformer';
-import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
-
-import {Deal} from '~/modules/deal/entities/deal.entity';
-
-import {Customer} from '../../customer/entities/customer.entity';
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 
 @Entity({name: 'company'})
 export class Company {
@@ -31,10 +27,4 @@ export class Company {
     @Exclude()
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
-
-    @OneToMany(() => Deal, (deal) => deal.company)
-    deals: Deal[];
-
-    @OneToMany(() => Customer, (customer) => customer.company)
-    contacts: Customer[];
 }

@@ -1,7 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
-
-import {User} from './user.entity';
+import {Exclude} from 'class-transformer';
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 
 export const accessAction = {
     CREATE: 'CREATE',
@@ -23,12 +22,11 @@ export class Role {
     @Column('text', {array: true, default: '{}'})
     access: string[];
 
+    @Exclude()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
 
+    @Exclude()
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
-
-    @OneToOne(() => User, (user) => user.role)
-    user: User;
 }

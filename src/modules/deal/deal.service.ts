@@ -59,7 +59,7 @@ export class DealService {
         return id;
     }
 
-    async updateStatusById(id: string, managerId: string, status: DealStatus): Promise<string> {
+    async updateStatusById(id: string, createdById: string, status: DealStatus): Promise<string> {
         return this.dealRepository.manager.transaction(async (entityManager) => {
             const currentDeal = await entityManager.findOne(Deal, {
                 where: {id},
@@ -82,7 +82,7 @@ export class DealService {
 
             await this.createSLALog(
                 {
-                    managerId,
+                    createdById,
                     dealId: id,
                     fromStatus: currentDeal.status,
                     toStatus: status,
@@ -118,7 +118,7 @@ export class DealService {
     }
 
     async createSLALog(dto: CreateSLALogDto, entityManager?: EntityManager): Promise<string> {
-        const {fromStatus, toStatus, dealId, managerId} = dto;
+        const {fromStatus, toStatus, dealId, createdById} = dto;
 
         let result: DealHistory;
 
@@ -128,14 +128,14 @@ export class DealService {
                 fromStatus,
                 toStatus,
                 deal: {id: dealId},
-                changedBy: {id: managerId},
+                changedBy: {id: createdById},
             });
         } else {
             result = await this.dealHistoryRepository.save({
                 fromStatus,
                 toStatus,
                 deal: {id: dealId},
-                changedBy: {id: managerId},
+                changedBy: {id: createdById},
             });
         }
 

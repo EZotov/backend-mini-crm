@@ -15,3 +15,4 @@ const uuidPipeOptions = {
     Модифицированный пайп под проверку UUID-параметра
 */
 export const ParseUUIDModifyPipe = new ParseUUIDPipe(uuidPipeOptions);
+export const ParseUUIDModifyOptionalPipe = new ParseUUIDPipe({...uuidPipeOptions, optional: true});

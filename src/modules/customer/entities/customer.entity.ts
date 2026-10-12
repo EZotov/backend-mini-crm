@@ -6,12 +6,9 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-
-import {Deal} from '~/modules/deal/entities/deal.entity';
 
 import {Company} from '../../company/entities/company.entity';
 
@@ -45,10 +42,7 @@ export class Customer {
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
-    @OneToMany(() => Deal, (deal) => deal.customer)
-    deals: Deal[];
-
-    @ManyToOne(() => Company, (company) => company.contacts)
+    @ManyToOne(() => Company)
     @JoinColumn({name: 'company_id'})
     company: Company;
 }

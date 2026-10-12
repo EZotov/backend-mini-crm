@@ -74,10 +74,10 @@ export class DealController {
     @Patch(':id')
     async changeStatus(
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @UserTokenData('id') managerId: string,
+        @UserTokenData('id') createdById: string,
         @Body() dto: ChangeStatusDealDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
-        await this.dealService.updateStatusById(id, managerId, dto.status);
+        await this.dealService.updateStatusById(id, createdById, dto.status);
 
         return new ResponseDto({
             data: new CreateResponseDto({id}),
