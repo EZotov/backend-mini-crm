@@ -2,7 +2,7 @@ import {ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger
 import {Response} from 'express';
 import {QueryFailedError} from 'typeorm';
 
-import {ErrorResponseDto} from '@dto/index';
+import {ErrorResponseDto} from '@dto/errors.dto';
 
 @Catch()
 export class ExceptionsFilter implements ExceptionFilter {

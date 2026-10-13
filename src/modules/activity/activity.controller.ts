@@ -3,7 +3,7 @@ import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
-import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 

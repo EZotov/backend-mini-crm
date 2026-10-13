@@ -1,8 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {IsArray, IsNumber, IsString} from 'class-validator';
 
-import {CodeType} from '@interfaces/errors.interface';
-
 export class PaginationDto {
     @ApiProperty()
     @IsNumber()
@@ -44,12 +42,4 @@ export class CollectionResponseDto<T> {
     @ApiProperty()
     @IsNumber()
     total: number;
-}
-
-export class ErrorResponseDto {
-    @ApiProperty()
-    code: CodeType | null;
-
-    @ApiProperty()
-    message: string | null;
 }

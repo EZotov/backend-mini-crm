@@ -3,7 +3,7 @@ import {HttpStatus} from '@nestjs/common/enums';
 import {ApiExtraModels, ApiOkResponse, ApiResponse, getSchemaPath} from '@nestjs/swagger';
 import {SchemaObject} from 'node_modules/@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 
-import {ErrorResponseDto} from '@dto/index';
+import {ErrorResponseDto} from '@dto/errors.dto';
 
 type ErrorType = {
     statusCode?: HttpStatus;

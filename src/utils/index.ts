@@ -1,17 +1,14 @@
 import {BadRequestException} from '@nestjs/common';
 import type {Response} from 'express';
 
-import {PAGE_SIZES, REFRESH_TOKEN_KEY} from '~/consts';
+import {PAGE_SIZES, REFRESH_TOKEN_KEY, REG_EXP} from '~/consts';
 
-type SetCookieOptions = {
+type CookieOptions = {
     isProduction: boolean;
-    days: number;
+    days?: number;
 };
 
-export const isUUID = (value: string): boolean => {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(value);
-};
+export const isUUID = (value: string): boolean => REG_EXP.UUID.test(value);
 
 export const getOffsetAndCheckPaginationParams = (pageNum: number, pageSize: number) => {
     if (!PAGE_SIZES.includes(pageSize) || pageNum < 1) {
@@ -21,7 +18,7 @@ export const getOffsetAndCheckPaginationParams = (pageNum: number, pageSize: num
     return (pageNum - 1) * pageSize;
 };
 
-export const setRefreshTokenInCookie = (res: Response, token: string, options?: SetCookieOptions) => {
+export const setRefreshTokenInCookie = (res: Response, token: string, options?: CookieOptions) => {
     const isProduction = options?.isProduction ?? true;
     const days = options?.days ?? 1;
 
@@ -30,5 +27,16 @@ export const setRefreshTokenInCookie = (res: Response, token: string, options?: 
         secure: isProduction,
         sameSite: isProduction ? 'strict' : 'lax',
         maxAge: days * 24 * 60 * 60 * 1000,
+    });
+};
+
+export const clearRefreshTokenCookie = (res: Response, options: CookieOptions) => {
+    const isProduction = options?.isProduction ?? true;
+
+    res.clearCookie(REFRESH_TOKEN_KEY, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 0,
     });
 };

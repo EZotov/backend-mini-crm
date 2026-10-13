@@ -1,6 +1,7 @@
 import {Module} from '@nestjs/common';
-import {ConfigModule} from '@nestjs/config';
+import {ConfigModule, ConfigService} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import {RedisModule} from '@nestjs-modules/ioredis';
 
 import getDBConfig from '../configs/db/options';
 import {ActivityModule} from './activity/activity.module';
@@ -19,6 +20,14 @@ import {UserModule} from './user/user.module';
             envFilePath: '.env',
         }),
         TypeOrmModule.forRoot({...getDBConfig(), autoLoadEntities: true}),
+        RedisModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                type: 'single',
+                url: configService.get<string>('REDIS_URL'),
+            }),
+        }),
         CompanyModule,
         CustomerModule,
         UserModule,

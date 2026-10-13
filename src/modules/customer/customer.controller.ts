@@ -4,7 +4,7 @@ import {plainToInstance} from 'class-transformer';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {JwtAuthGuard} from '@guards/auth.guard';
-import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '~/dto';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {CustomerService} from './customer.service';

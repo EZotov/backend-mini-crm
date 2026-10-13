@@ -14,10 +14,28 @@ export class LoginRequestDto {
     password: string;
 }
 
+export class TokensDto {
+    constructor(dto: Partial<TokensDto>) {
+        Object.assign(this, dto);
+    }
+
+    @ApiProperty()
+    @IsString()
+    accessToken: string;
+
+    @ApiProperty()
+    @IsString()
+    refreshToken: string;
+}
+
 export class LoginDto {
     constructor(dto: Partial<LoginDto>) {
         Object.assign(this, dto);
     }
+
+    @ApiProperty()
+    @IsString()
+    userId: string;
 
     @ApiProperty()
     @IsString()

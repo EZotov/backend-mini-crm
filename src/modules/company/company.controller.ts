@@ -2,7 +2,7 @@ import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Us
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
-import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/index';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
