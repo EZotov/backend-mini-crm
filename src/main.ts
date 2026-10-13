@@ -23,8 +23,8 @@ async function bootstrap() {
         .setTitle('Mini CRM')
         .setDescription('API мини CRM')
         .setVersion('1.0')
-        .setBasePath(globalPrefix)
         .addBearerAuth()
+        .addSecurityRequirements('bearer')
         .build();
 
     const document = SwaggerModule.createDocument(app, config);

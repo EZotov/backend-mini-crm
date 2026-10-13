@@ -36,7 +36,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         const existSession = await this.authService.checkSession(payload.id);
 
         if (!existSession) {
-            throw authError;
+            throw new UnauthorizedException('Сессия авторизации не найдена или скомпрометирована');
         }
 
         const user = await this.userService.getUserById(payload.id);

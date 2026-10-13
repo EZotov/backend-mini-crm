@@ -11,7 +11,7 @@ import {clearRefreshTokenCookie, setRefreshTokenInCookie} from '~/utils';
 
 import {CreateUserDto} from '../user/dto/user.dto';
 import {AuthService} from './auth.service';
-import {LoginDto, LoginRequestDto, RefreshAccessTokenDto, TokensDto} from './dto/auth.dto';
+import {LoginRequestDto, RefreshAccessTokenDto, TokensDto} from './dto/auth.dto';
 
 @ApiTags('Аутентификация')
 @Controller('auth')
@@ -26,13 +26,13 @@ export class AuthController {
     }
 
     @ApiOperation({summary: 'Зарегистрировать нового пользователя'})
-    @ApiOkModifyResponse(LoginDto)
+    @ApiOkModifyResponse(TokensDto)
     @Post('sign-up')
     async registration(
         @Body() dto: CreateUserDto,
         @Req() req: Request,
-        @Res() res: Response,
-    ): Promise<ResponseDto<LoginDto>> {
+        @Res({passthrough: true}) res: Response,
+    ): Promise<ResponseDto<TokensDto>> {
         const {userId, ...tokens} = await this.authService.registration(dto);
 
         const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
@@ -52,7 +52,7 @@ export class AuthController {
         });
 
         return new ResponseDto({
-            data: new LoginDto(tokens),
+            data: new TokensDto(tokens),
         });
     }
 

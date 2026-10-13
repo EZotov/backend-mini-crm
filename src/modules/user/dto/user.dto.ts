@@ -1,6 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Transform} from 'class-transformer';
-import {IsEmail, IsString, Matches, MaxLength, MinLength} from 'class-validator';
+import {IsEmail, IsOptional, IsString, Matches, MaxLength, MinLength} from 'class-validator';
 
 import {REG_EXP} from '@consts/index';
 
@@ -20,6 +20,8 @@ export class CreateUserDto {
     lastName: string;
 
     @ApiProperty({required: false})
+    @IsOptional()
+    @IsString()
     patronymic?: string;
 
     @ApiProperty()
