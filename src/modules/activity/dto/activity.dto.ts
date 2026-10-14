@@ -32,10 +32,6 @@ export class CreateOrUpdateActivityDto {
     @IsOptional()
     @IsUUID()
     assignedId?: UserDto;
-
-    @ApiProperty()
-    @IsUUID()
-    createdById: string;
 }
 
 export class ActivityShortDto {

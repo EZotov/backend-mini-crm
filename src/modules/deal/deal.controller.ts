@@ -47,8 +47,11 @@ export class DealController {
     @ApiOperation({summary: 'Создать сделку'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    async create(@Body() dto: CreateDealDto): Promise<ResponseDto<CreateResponseDto>> {
-        const createdId = await this.dealService.create(dto);
+    async create(
+        @UserTokenData('id') userId: string,
+        @Body() dto: CreateDealDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        const createdId = await this.dealService.create(userId, dto);
 
         return new ResponseDto({
             data: new CreateResponseDto({id: createdId}),

@@ -37,8 +37,8 @@ export class CompanyService {
         return company;
     }
 
-    async create(dto: CreateCompanyDto): Promise<string> {
-        const company = await this.companyRepository.save(dto);
+    async create(userId: string, dto: CreateCompanyDto): Promise<string> {
+        const company = await this.companyRepository.save({...dto, createdBy: {id: userId}});
 
         return company.id;
     }

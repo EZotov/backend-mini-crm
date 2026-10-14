@@ -52,8 +52,8 @@ export class ActivityService {
         return {activities, total};
     }
 
-    async create(dto: CreateOrUpdateActivityDto) {
-        const activity = await this.activityRepository.save(dto);
+    async create(userId: string, dto: CreateOrUpdateActivityDto) {
+        const activity = await this.activityRepository.save({...dto, createdBy: {id: userId}});
 
         return activity.id;
     }

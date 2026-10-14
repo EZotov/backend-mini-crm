@@ -35,8 +35,8 @@ export class Deal {
     @Column({enum: DEAL_STATUS_ENUM, default: DEAL_STATUS.NEW})
     status: DealStatus;
 
-    @ApiProperty()
-    @Column({name: 'sla_deadline', type: 'timestamp', nullable: true})
+    @ApiProperty({example: '2026-10-14T13:45:00.000Z'})
+    @Column({name: 'sla_deadline', type: 'timestamptz'})
     slaDeadline: Date;
 
     @ApiProperty()

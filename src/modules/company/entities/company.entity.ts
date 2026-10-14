@@ -1,6 +1,16 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Exclude} from 'class-transformer';
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
+
+import {User} from '~/modules/user/entities/user.entity';
 
 @Entity({name: 'company'})
 export class Company {
@@ -19,6 +29,10 @@ export class Company {
     @ApiProperty()
     @Column({nullable: true})
     inn: string;
+
+    @ManyToOne(() => User, {onDelete: 'SET NULL'})
+    @JoinColumn({name: 'created_by'})
+    createdBy: User;
 
     @Exclude()
     @CreateDateColumn({name: 'created_at'})

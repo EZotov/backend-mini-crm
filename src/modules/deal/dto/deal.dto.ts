@@ -1,6 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Type} from 'class-transformer';
-import {IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID} from 'class-validator';
+import {IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID} from 'class-validator';
 
 import {CustomerDto} from '~/modules/customer/dto/customer.dto';
 import {UserDto} from '~/modules/user/dto/user.dto';
@@ -9,14 +9,6 @@ import {DEAL_STATUS_ENUM} from '../consts';
 import type {DealStatus} from '../types';
 
 export class CreateDealDto {
-    @ApiProperty({
-        example: 'd3b07384-d113-4956-a5e2-aa59df3a8d9a',
-        description: 'UUID создателя (User)',
-    })
-    @IsUUID()
-    @IsNotEmpty()
-    createdById: string;
-
     @ApiProperty({
         example: 'd3b07384-d113-4956-a5e2-aa59df3a8d9a',
         description: 'UUID менеджера (User)',
@@ -51,16 +43,6 @@ export class CreateDealDto {
     @IsNotEmpty()
     @IsNumber()
     budget: number;
-
-    @ApiProperty({type: 'string', format: 'date-time'})
-    @IsNotEmpty()
-    @IsString()
-    slaDeadline: string;
-
-    @ApiProperty({type: 'boolean'})
-    @IsNotEmpty()
-    @IsBoolean()
-    isSlaViolated: boolean;
 }
 
 export class DealDto {
@@ -106,7 +88,7 @@ export class ChangeStatusDealDto {
     status: DealStatus;
 }
 
-export class CreateSLALogDto {
+export class CreateDealHistoryLogDto {
     @ApiProperty()
     @IsUUID('4')
     dealId: string;

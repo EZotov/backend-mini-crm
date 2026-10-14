@@ -2,6 +2,7 @@ import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Us
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
@@ -43,8 +44,11 @@ export class CompanyController {
     @ApiOperation({summary: 'Создать новую компанию'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    async create(@Body() dto: CreateCompanyDto): Promise<ResponseDto<CreateResponseDto>> {
-        const createdId = await this.companyService.create(dto);
+    async create(
+        @UserTokenData('id') userId: string,
+        @Body() dto: CreateCompanyDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        const createdId = await this.companyService.create(userId, dto);
 
         return new ResponseDto<CreateResponseDto>({
             data: new CreateResponseDto({id: createdId}),

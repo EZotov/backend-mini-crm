@@ -3,6 +3,7 @@ import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
@@ -45,8 +46,11 @@ export class ActivityController {
     @ApiOperation({summary: 'Создать новую задачу'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    async create(@Body() dto: CreateOrUpdateActivityDto): Promise<ResponseDto<CreateResponseDto>> {
-        const createdId = await this.activityService.create(dto);
+    async create(
+        @UserTokenData('id') userId: string,
+        @Body() dto: CreateOrUpdateActivityDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        const createdId = await this.activityService.create(userId, dto);
 
         return new ResponseDto<CreateResponseDto>({
             data: new CreateResponseDto({id: createdId}),
