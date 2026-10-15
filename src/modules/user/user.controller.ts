@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
@@ -13,12 +13,12 @@ import {UpdatePasswordDto, UpdateUserDto, UserDto} from './dto/user.dto';
 import {UserService} from './user.service';
 
 @ApiTags('Пользователи')
-@AuthProtected()
+@AuthProtected(ROLES.ADMIN)
 @Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @ApiOperation({summary: 'Получить всех пользователей'})
+    @ApiOperation({summary: 'Получить всех пользователей (для админа)'})
     @ApiOkModifyResponse(UserDto, {isArray: true})
     @Get()
     async getAll(
@@ -33,7 +33,7 @@ export class UserController {
         });
     }
 
-    @ApiOperation({summary: 'Получить профиль пользователя'})
+    @ApiOperation({summary: 'Получить профиль пользователя (для админа)'})
     @ApiOkModifyResponse(UserDto)
     @Get(':id')
     async getUser(@Param('id', ParseUUIDModifyPipe) userId: string): Promise<ResponseDto<UserDto>> {
@@ -58,13 +58,9 @@ export class UserController {
         });
     }
 
-    @ApiOperation({summary: 'Удалить пользователя'})
+    @ApiOperation({summary: 'Удалить пользователя (для админа)'})
     @Delete(':id')
-    deleteUser(@Param('id', ParseUUIDModifyPipe) userId: string, @UserTokenData('role') role: string): Promise<void> {
-        if (role !== ROLES.ADMIN) {
-            throw new ForbiddenException('Не хватает прав доступа');
-        }
-
+    deleteUser(@Param('id', ParseUUIDModifyPipe) userId: string): Promise<void> {
         return this.userService.removeUserById(userId);
     }
 }

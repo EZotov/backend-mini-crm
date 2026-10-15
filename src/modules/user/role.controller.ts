@@ -1,9 +1,10 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
+import {ROLES} from '@consts/index';
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {AuthProtected} from '@decorators/auth.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
-import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {CreateRoleDto} from './dto/role.dto';
@@ -11,7 +12,7 @@ import {Role} from './entities/role.entity';
 import {UserService} from './user.service';
 
 @ApiTags('Роли')
-@AuthProtected()
+@AuthProtected(ROLES.ADMIN)
 @Controller('roles')
 export class RoleController {
     constructor(private readonly userService: UserService) {}
