@@ -1,12 +1,12 @@
-import {Body, Controller, Post, Req, Res, UseGuards} from '@nestjs/common';
+import {Body, Controller, Post, Req, Res} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {ApiExcludeEndpoint, ApiOperation, ApiTags} from '@nestjs/swagger';
 import type {Request, Response} from 'express';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {AuthProtected} from '@decorators/auth.decorator';
 import {Cookie} from '@decorators/cookie.decorator';
 import {ResponseDto} from '@dto/api.dto';
-import {JwtAuthGuard} from '@guards/auth.guard';
 import {clearRefreshTokenCookie, setRefreshTokenInCookie} from '~/utils';
 
 import {CreateUserDto} from '../user/dto/user.dto';
@@ -109,7 +109,7 @@ export class AuthController {
     @ApiExcludeEndpoint()
     @ApiOperation({summary: 'Выйти из системы'})
     @ApiOkModifyResponse()
-    @UseGuards(JwtAuthGuard)
+    @AuthProtected()
     @Post('logout')
     logout(): ResponseDto<string> {
         return {data: 'Not implemented'};

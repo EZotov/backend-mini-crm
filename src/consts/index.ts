@@ -9,6 +9,7 @@ export const PASSWORD_SALT = 10;
 // Временный список ролей пока не реализована система доступа по действиям
 export const ROLES = {
     ADMIN: 'ADMIN',
+    MANAGER: 'MANAGER',
     USER: 'USER',
 } as const;
 

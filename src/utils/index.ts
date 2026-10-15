@@ -1,7 +1,8 @@
 import {BadRequestException} from '@nestjs/common';
+import {hash} from 'bcrypt';
 import type {Response} from 'express';
 
-import {PAGE_SIZES, REFRESH_TOKEN_KEY, REG_EXP} from '~/consts';
+import {PAGE_SIZES, PASSWORD_SALT, REFRESH_TOKEN_KEY, REG_EXP} from '~/consts';
 
 type CookieOptions = {
     isProduction: boolean;
@@ -39,4 +40,18 @@ export const clearRefreshTokenCookie = (res: Response, options: CookieOptions) =
         sameSite: isProduction ? 'strict' : 'lax',
         maxAge: 0,
     });
+};
+
+export const getHashedPassword = async (password: string, confirmPassword: string) => {
+    if (!password || !confirmPassword) {
+        throw new BadRequestException('Один или оба пароля пусты');
+    }
+
+    if (password !== confirmPassword) {
+        throw new BadRequestException('Пароли не совпадают');
+    }
+
+    const hashedPassword = await hash(password, PASSWORD_SALT);
+
+    return hashedPassword;
 };

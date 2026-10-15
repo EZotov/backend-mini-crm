@@ -1,11 +1,11 @@
-import {Controller, Get, UseGuards} from '@nestjs/common';
+import {Controller, Get} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
+import {AuthProtected} from '@decorators/auth.decorator';
 import {ResponseDto} from '@dto/api.dto';
-import {JwtAuthGuard} from '@guards/auth.guard';
 
 @ApiTags('Аналитика')
-@UseGuards(JwtAuthGuard)
+@AuthProtected()
 @Controller('analytics')
 export class AnalyticsController {
     @ApiOperation({summary: 'Получить сводку аналитики'})

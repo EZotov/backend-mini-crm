@@ -1,11 +1,11 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {AuthProtected} from '@decorators/auth.decorator';
 import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
-import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {ActivityService} from './activity.service';
@@ -14,7 +14,7 @@ import {Activity} from './entities/activity.entity';
 import {GroupedActivityEntities} from './types';
 
 @ApiTags('Задачи')
-@UseGuards(JwtAuthGuard)
+@AuthProtected()
 @Controller('activities')
 export class ActivityController {
     constructor(private readonly activityService: ActivityService) {}

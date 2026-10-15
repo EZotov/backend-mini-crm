@@ -1,11 +1,11 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {AuthProtected} from '@decorators/auth.decorator';
 import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
-import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {DealService} from './deal.service';
@@ -15,7 +15,7 @@ import {Deal} from './entities/deal.entity';
 import {DealHistory} from './entities/deal-history.entity';
 
 @ApiTags('Сделки')
-@UseGuards(JwtAuthGuard)
+@AuthProtected()
 @Controller('deals')
 export class DealController {
     constructor(private readonly dealService: DealService) {}

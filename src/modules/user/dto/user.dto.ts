@@ -34,6 +34,7 @@ export class CreateUserDto {
     @Matches(REG_EXP.PASSWORD, {message: 'Неверный формат пароля'})
     confirmPassword: string;
 }
+
 export class UpdateUserDto {
     @ApiProperty()
     @IsEmail(undefined, {message: 'Некорректный формат почты'})
@@ -51,6 +52,13 @@ export class UpdateUserDto {
     lastName: string;
 }
 export class UpdatePasswordDto {
+    @ApiProperty({description: 'Новый пароль'})
+    @IsString()
+    @MinLength(6, {message: 'Пароль должен быть от 6 символов'})
+    @MaxLength(20, {message: 'Пароль должен быть не более 20 символов'})
+    @Matches(REG_EXP.PASSWORD, {message: 'Пароль не должен содержать кириллицу, спецсимволы, пробелы'})
+    currentPassword: string;
+
     @ApiProperty({description: 'Новый пароль'})
     @IsString()
     @MinLength(6, {message: 'Пароль должен быть от 6 символов'})

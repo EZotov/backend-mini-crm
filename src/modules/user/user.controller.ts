@@ -1,19 +1,19 @@
-import {Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Put, Query, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
 import {ROLES} from '@consts/index';
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {AuthProtected} from '@decorators/auth.decorator';
 import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
-import {JwtAuthGuard} from '@guards/auth.guard';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
-import {UpdateUserDto, UserDto} from './dto/user.dto';
+import {UpdatePasswordDto, UpdateUserDto, UserDto} from './dto/user.dto';
 import {UserService} from './user.service';
 
 @ApiTags('Пользователи')
-@UseGuards(JwtAuthGuard)
+@AuthProtected()
 @Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService) {}
@@ -44,12 +44,12 @@ export class UserController {
         });
     }
 
-    @ApiOperation({summary: 'Изменить данные чужого профиля'})
+    @ApiOperation({summary: 'Изменить данные чужого профиля (для админа)'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
     async updateUserProfile(
         @Param('id', ParseUUIDModifyPipe) userId: string,
-        updateDto: UpdateUserDto,
+        @Body() updateDto: UpdateUserDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         await this.userService.updateUserProfile(userId, updateDto);
 
@@ -70,7 +70,7 @@ export class UserController {
 }
 
 @ApiTags('Мой профиль')
-@UseGuards(JwtAuthGuard)
+@AuthProtected()
 @Controller('users/me')
 export class MeUserController {
     constructor(private readonly userService: UserService) {}
@@ -97,6 +97,20 @@ export class MeUserController {
 
         return new ResponseDto({
             data: new CreateResponseDto({id: userId}),
+        });
+    }
+
+    @ApiOperation({summary: 'Изменить пароль своего профиля'})
+    @ApiOkModifyResponse(CreateResponseDto)
+    @Put()
+    async updateMyProfilePassword(
+        @UserTokenData('id', ParseUUIDModifyPipe) userId: string,
+        updateDto: UpdatePasswordDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        const updatedUserId = await this.userService.updatePassword(userId, updateDto);
+
+        return new ResponseDto({
+            data: new CreateResponseDto({id: updatedUserId}),
         });
     }
 

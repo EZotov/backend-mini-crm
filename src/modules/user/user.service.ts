@@ -1,11 +1,11 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {compare, hash} from 'bcrypt';
+import {compare} from 'bcrypt';
 import {Repository} from 'typeorm';
 
 import {loginError} from '@consts/errors';
-import {DEFAULT_ORDER, PASSWORD_SALT} from '~/consts';
-import {getOffsetAndCheckPaginationParams} from '~/utils';
+import {DEFAULT_ORDER} from '~/consts';
+import {getHashedPassword, getOffsetAndCheckPaginationParams} from '~/utils';
 
 import {LoginRequestDto} from '../auth/dto/auth.dto';
 import {CreateRoleDto} from './dto/role.dto';
@@ -63,37 +63,30 @@ export class UserService {
     async createUser(createDto: CreateUserDto): Promise<string> {
         const {password, confirmPassword, ...dto} = createDto;
 
-        if (!password || !confirmPassword) {
-            throw new BadRequestException('Один или оба пароля пусты');
-        }
-
-        if (password !== confirmPassword) {
-            throw new BadRequestException('Пароли не совпадают');
-        }
-
-        const hashedPassword = await hash(password, PASSWORD_SALT);
+        const hashedPassword = await getHashedPassword(password, confirmPassword);
 
         const createdUser = await this.userRepository.save({...dto, password: hashedPassword});
 
         return createdUser.id;
     }
 
-    async updatePassword(userId: string, dto: UpdatePasswordDto) {
-        if (!dto.newPassword || !dto.confirmPassword) {
-            throw new BadRequestException('Один или оба пароля пусты');
+    async updatePassword(userId: string, dto: UpdatePasswordDto): Promise<string> {
+        const {password} = await this.getUserById(userId);
+
+        const isCurrentPasswordCorrect = await compare(dto.currentPassword, password);
+
+        if (!isCurrentPasswordCorrect) {
+            throw new BadRequestException('Неверный старый пароль');
         }
 
-        if (dto.newPassword !== dto.confirmPassword) {
-            throw new BadRequestException('Пароли не совпадают');
-        }
-
-        const hashedPassword = await hash(dto.newPassword, PASSWORD_SALT);
-
+        const hashedPassword = await getHashedPassword(dto.newPassword, dto.confirmPassword);
         const result = await this.userRepository.update(userId, {password: hashedPassword});
 
         if (!result.affected) {
             throw new NotFoundException('Пользователя не существует');
         }
+
+        return userId;
     }
 
     async updateUserProfile(userId: string, updateDto: UpdateUserDto): Promise<string> {

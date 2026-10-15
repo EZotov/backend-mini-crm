@@ -11,7 +11,7 @@ import {Role} from './entities/role.entity';
 import {UserService} from './user.service';
 
 @ApiTags('Роли')
-@UseGuards(JwtAuthGuard)
+@AuthProtected()
 @Controller('roles')
 export class RoleController {
     constructor(private readonly userService: UserService) {}
