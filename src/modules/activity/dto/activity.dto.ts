@@ -1,4 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
+import {Type} from 'class-transformer';
 import {IsOptional, IsString, IsUUID} from 'class-validator';
 
 import {DealDto} from '~/modules/deal/dto/deal.dto';
@@ -48,12 +49,15 @@ export class ActivityShortDto {
     dueDate: Date;
 
     @ApiProperty({type: DealDto})
+    @Type(() => DealDto)
     deal: DealDto;
 
     @ApiProperty({type: UserDto})
+    @Type(() => UserDto)
     assigned: UserDto;
 
     @ApiProperty({type: UserDto})
+    @Type(() => UserDto)
     createdBy: UserDto;
 }
 

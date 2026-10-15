@@ -131,7 +131,7 @@ export class DealService {
         }
     }
 
-    async getHistoryLogList(pageNum: number, pageSize: number) {
+    async getDealHistoryList(pageNum: number, pageSize: number) {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [logs, total] = await this.dealHistoryRepository.findAndCount({

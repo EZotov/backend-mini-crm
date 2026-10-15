@@ -10,7 +10,9 @@ import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {DealService} from './deal.service';
 import {ChangeStatusDealDto, CreateDealDto, DealDto} from './dto/deal.dto';
+import {DealHistoryDto} from './dto/deal-history.dto';
 import {Deal} from './entities/deal.entity';
+import {DealHistory} from './entities/deal-history.entity';
 
 @ApiTags('Сделки')
 @UseGuards(JwtAuthGuard)
@@ -84,6 +86,24 @@ export class DealController {
 
         return new ResponseDto({
             data: new CreateResponseDto({id}),
+        });
+    }
+
+    @ApiOperation({summary: 'Получить историю по сделке'})
+    @ApiOkModifyResponse(DealHistory)
+    @Get(':id')
+    async getDealHistory(
+        @Param('id', ParseUUIDModifyPipe) id: string,
+        @Query('pageNum', ParseIntPipe) pageNum: number,
+        @Query('pageSize', ParseIntPipe) pageSize: number,
+    ): Promise<CollectionResponseDto<DealHistoryDto>> {
+        console.log(id);
+
+        const {logs, total} = await this.dealService.getDealHistoryList(pageNum, pageSize);
+
+        return new CollectionResponseDto({
+            data: plainToInstance(DealHistoryDto, logs),
+            total,
         });
     }
 
