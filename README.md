@@ -27,3 +27,6 @@
 * **Real-time:** Socket.io
 * **Scheduling:** Node-cron
 * **Cache** Redis
+
+## 🛠️ Описание API
+Swagger-документация доступна по /api-docs
