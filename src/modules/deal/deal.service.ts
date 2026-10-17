@@ -56,8 +56,6 @@ export class DealService {
     }
 
     async updateById(id: string, dto: CreateOrUpdateDealDto): Promise<string> {
-        // const result = await this.dealRepository.update(id, dto);
-
         const {customerId, managerId, companyId, ...flatDto} = dto;
 
         const result = await updateByIdWithRelations(this.dealRepository, Deal, id, flatDto, {
