@@ -4,8 +4,8 @@ import {compare} from 'bcrypt';
 import {Repository} from 'typeorm';
 
 import {loginError} from '@consts/errors';
-import {DEFAULT_ORDER} from '~/consts';
-import {getHashedPassword, getOffsetAndCheckPaginationParams} from '~/utils';
+import {DEFAULT_ORDER, ROLES} from '~/consts';
+import {getHashedPassword, getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
 
 import {LoginRequestDto} from '../auth/dto/auth.dto';
 import {CreateRoleDto} from './dto/role.dto';
@@ -63,9 +63,17 @@ export class UserService {
     async createUser(createDto: CreateUserDto): Promise<string> {
         const {password, confirmPassword, ...dto} = createDto;
 
+        const userRole = await this.roleRepository.findOneBy({
+            title: ROLES.USER,
+        });
+
         const hashedPassword = await getHashedPassword(password, confirmPassword);
 
-        const createdUser = await this.userRepository.save({...dto, password: hashedPassword});
+        const createdUser = await this.userRepository.save({
+            ...dto,
+            password: hashedPassword,
+            role: {id: userRole?.id},
+        });
 
         return createdUser.id;
     }
@@ -90,7 +98,9 @@ export class UserService {
     }
 
     async updateUserProfile(userId: string, updateDto: UpdateUserDto): Promise<string> {
-        const result = await this.userRepository.update(userId, updateDto);
+        const {roleId, ...restDto} = updateDto;
+
+        const result = await updateByIdWithRelations(this.userRepository, User, userId, restDto, {role: roleId});
 
         if (!result.affected) {
             throw new NotFoundException('Пользователь не найден');

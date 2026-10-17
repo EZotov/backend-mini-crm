@@ -26,6 +26,10 @@ import {UserModule} from './user/user.module';
             useFactory: (configService: ConfigService) => ({
                 type: 'single',
                 url: configService.get<string>('REDIS_URL'),
+                options: {
+                    maxRetriesPerRequest: 0,
+                    disconnectTimeout: 1000,
+                },
             }),
         }),
         CompanyModule,

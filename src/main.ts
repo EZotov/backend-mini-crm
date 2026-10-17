@@ -1,10 +1,11 @@
-import {BadRequestException, ClassSerializerInterceptor, ValidationPipe} from '@nestjs/common';
+import {BadRequestException, ValidationPipe} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {NestFactory, Reflector} from '@nestjs/core';
+import {NestFactory} from '@nestjs/core';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 
 import {ExceptionsFilter} from './filters/errors.filter';
+import {PostStatusInterceptor} from './interceptors/status-code.interceptor';
 import {AppModule} from './modules/app.module';
 
 const globalPrefix = 'v1';
@@ -29,8 +30,7 @@ async function bootstrap() {
 
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api-docs', app, document);
-
-    app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+    app.useGlobalInterceptors(new PostStatusInterceptor());
     app.useGlobalFilters(new ExceptionsFilter());
     app.useGlobalPipes(
         new ValidationPipe({

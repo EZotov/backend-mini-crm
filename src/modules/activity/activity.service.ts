@@ -2,6 +2,8 @@ import {Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
+import {updateByIdWithRelations} from '~/utils/helpers';
+
 import {CreateOrUpdateActivityDto} from './dto/activity.dto';
 import {Activity} from './entities/activity.entity';
 import type {GroupedActivityEntities} from './types';
@@ -58,14 +60,19 @@ export class ActivityService {
         return activity.id;
     }
 
-    async updateById(activityId: string, dto: CreateOrUpdateActivityDto): Promise<string> {
-        const result = await this.activityRepository.update(activityId, dto);
+    async updateById(id: string, dto: CreateOrUpdateActivityDto): Promise<string> {
+        const {assignedId, dealId, ...flatFields} = dto;
+
+        const result = await updateByIdWithRelations(this.activityRepository, Activity, id, flatFields, {
+            deal: dealId,
+            assigned: assignedId,
+        });
 
         if (!result.affected) {
-            throw new NotFoundException('');
+            throw new NotFoundException(`Активность с ID ${id} не найдена`);
         }
 
-        return activityId;
+        return id;
     }
 
     async removeById(activityId: string): Promise<void> {

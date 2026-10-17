@@ -1,6 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Transform} from 'class-transformer';
-import {IsEmail, IsOptional, IsString, Matches, MaxLength, MinLength} from 'class-validator';
+import {Expose, Transform, Type} from 'class-transformer';
+import {IsEmail, IsOptional, IsString, IsUUID, Matches, MaxLength, MinLength} from 'class-validator';
 
 import {REG_EXP} from '@consts/index';
 
@@ -45,11 +45,17 @@ export class UpdateUserDto {
     firstName: string;
 
     @ApiProperty({required: false})
+    @IsString()
+    @IsOptional()
     patronymic?: string;
 
     @ApiProperty()
     @IsString()
     lastName: string;
+
+    @ApiProperty()
+    @IsUUID()
+    roleId: string;
 }
 export class UpdatePasswordDto {
     @ApiProperty({description: 'Новый пароль'})
@@ -76,22 +82,29 @@ export class UpdatePasswordDto {
 
 export class UserDto {
     @ApiProperty()
+    @Expose()
     id: string;
 
     @ApiProperty()
+    @Expose()
     @IsEmail()
     email: string;
 
     @ApiProperty()
+    @Expose()
     firstName: string;
 
-    @ApiProperty({required: false, nullable: true})
+    @ApiProperty({type: 'string', required: false, nullable: true})
+    @Expose()
     patronymic: string | null;
 
     @ApiProperty()
+    @Expose()
     lastName: string;
 
     @ApiProperty({type: 'string', required: false, nullable: true})
+    @Expose()
+    @Type(() => String)
     @Transform(({obj}: {obj: User}) => obj.role?.title || null)
     role: string | null;
 }

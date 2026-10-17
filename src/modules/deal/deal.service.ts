@@ -3,10 +3,10 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {EntityManager, Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '@consts/index';
-import {getOffsetAndCheckPaginationParams} from '~/utils';
+import {getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
 
 import {DEAL_AVAILABLE_STATUS, DEAL_STATUS} from './consts';
-import {CreateDealDto, CreateDealHistoryLogDto} from './dto/deal.dto';
+import {CreateDealHistoryLogDto, CreateOrUpdateDealDto} from './dto/deal.dto';
 import {Deal} from './entities/deal.entity';
 import {DealHistory} from './entities/deal-history.entity';
 import {SlaLog} from './entities/sla.entity';
@@ -45,7 +45,7 @@ export class DealService {
         return deal;
     }
 
-    async create(userId: string, dto: CreateDealDto): Promise<string> {
+    async create(userId: string, dto: CreateOrUpdateDealDto): Promise<string> {
         const result = await this.dealRepository.save({
             ...dto,
             createdBy: {id: userId},
@@ -55,8 +55,16 @@ export class DealService {
         return result.id;
     }
 
-    async updateById(id: string, dto: CreateDealDto): Promise<string> {
-        const result = await this.dealRepository.update(id, dto);
+    async updateById(id: string, dto: CreateOrUpdateDealDto): Promise<string> {
+        // const result = await this.dealRepository.update(id, dto);
+
+        const {customerId, managerId, companyId, ...flatDto} = dto;
+
+        const result = await updateByIdWithRelations(this.dealRepository, Deal, id, flatDto, {
+            company: companyId,
+            manager: managerId,
+            customer: customerId,
+        });
 
         if (!result.affected) {
             throw new NotFoundException(`Сделка по ${id} не найдена для обновления`);

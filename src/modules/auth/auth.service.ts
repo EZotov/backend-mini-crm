@@ -1,4 +1,9 @@
-import {Injectable, InternalServerErrorException, UnauthorizedException} from '@nestjs/common';
+import {
+    Injectable,
+    InternalServerErrorException,
+    ServiceUnavailableException,
+    UnauthorizedException,
+} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {JwtService} from '@nestjs/jwt';
 import {InjectRedis} from '@nestjs-modules/ioredis';
@@ -94,7 +99,7 @@ export class AuthService {
             return result === 1;
         } catch (error) {
             console.error(error);
-            return false;
+            throw new ServiceUnavailableException('Ошибка в проверке сессии. Возможно соединение с Redis потеряно');
         }
     }
 
@@ -111,7 +116,7 @@ export class AuthService {
             return result as unknown as SessionData;
         } catch (error) {
             console.error(error);
-            return null;
+            throw new ServiceUnavailableException('Ошибка в получении сессии. Возможно соединение с Redis потеряно');
         }
     }
 

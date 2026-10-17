@@ -1,13 +1,13 @@
 import {Body, Controller, Post, Req, Res} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {ApiExcludeEndpoint, ApiOperation, ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import type {Request, Response} from 'express';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {AuthProtected} from '@decorators/auth.decorator';
 import {Cookie} from '@decorators/cookie.decorator';
 import {ResponseDto} from '@dto/api.dto';
-import {clearRefreshTokenCookie, setRefreshTokenInCookie} from '~/utils';
+import {clearRefreshTokenCookie, setRefreshTokenInCookie} from '~/utils/helpers';
 
 import {CreateUserDto} from '../user/dto/user.dto';
 import {AuthService} from './auth.service';
@@ -106,7 +106,6 @@ export class AuthController {
         }
     }
 
-    @ApiExcludeEndpoint()
     @ApiOperation({summary: 'Выйти из системы'})
     @ApiOkModifyResponse()
     @AuthProtected()

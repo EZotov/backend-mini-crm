@@ -43,6 +43,7 @@ export class Customer {
     updatedAt: Date;
 
     @ManyToOne(() => Company)
+    @Exclude()
     @JoinColumn({name: 'company_id'})
     company: Company;
 }

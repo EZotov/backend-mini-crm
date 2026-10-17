@@ -8,7 +8,7 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dt
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {CompanyService} from './company.service';
-import {CreateCompanyDto} from './dto/company.dto';
+import {CreateOrUpdateCompanyDto} from './dto/company.dto';
 import {Company} from './entities/company.entity';
 
 @ApiTags('Компании')
@@ -46,7 +46,7 @@ export class CompanyController {
     @Post()
     async create(
         @UserTokenData('id') userId: string,
-        @Body() dto: CreateCompanyDto,
+        @Body() dto: CreateOrUpdateCompanyDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         const createdId = await this.companyService.create(userId, dto);
 
@@ -60,7 +60,7 @@ export class CompanyController {
     @Put(':id')
     async update(
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @Body() dto: CreateCompanyDto,
+        @Body() dto: CreateOrUpdateCompanyDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         await this.companyService.updateById(id, dto);
 

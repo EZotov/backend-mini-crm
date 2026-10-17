@@ -38,7 +38,9 @@ export class ActivityController {
         const {activities, total} = await this.activityService.getAllByDeal(dealId, true);
 
         return new CollectionResponseDto({
-            data: plainToInstance(GroupedActivityByStatusDto, activities as GroupedActivityEntities[]),
+            data: plainToInstance(GroupedActivityByStatusDto, activities as GroupedActivityEntities[], {
+                excludeExtraneousValues: true,
+            }),
             total,
         });
     }

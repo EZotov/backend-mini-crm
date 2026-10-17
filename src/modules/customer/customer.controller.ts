@@ -8,7 +8,7 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dt
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {CustomerService} from './customer.service';
-import {CreateCustomerDto, CustomerDto} from './dto/customer.dto';
+import {CreateOrUpdateCustomerDto, CustomerDto} from './dto/customer.dto';
 
 @ApiTags('Заказчики')
 @AuthProtected()
@@ -26,7 +26,7 @@ export class CustomerController {
         const {customers, totalCounts} = await this.customerService.getList(pageNum, pageSize);
 
         return new CollectionResponseDto({
-            data: customers.map((customer) => plainToInstance(CustomerDto, customer)),
+            data: plainToInstance(CustomerDto, customers, {excludeExtraneousValues: true}),
             total: totalCounts,
         });
     }
@@ -37,13 +37,15 @@ export class CustomerController {
     async get(@Param('id', ParseUUIDModifyPipe) id: string): Promise<ResponseDto<CustomerDto>> {
         const customer = await this.customerService.getById(id);
 
-        return new ResponseDto({data: plainToInstance(CustomerDto, customer)});
+        return new ResponseDto({
+            data: plainToInstance(CustomerDto, customer, {excludeExtraneousValues: true}),
+        });
     }
 
     @ApiOperation({summary: 'Создать нового заказчика'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    async create(@Body() createDto: CreateCustomerDto): Promise<ResponseDto<CreateResponseDto>> {
+    async create(@Body() createDto: CreateOrUpdateCustomerDto): Promise<ResponseDto<CreateResponseDto>> {
         const id = await this.customerService.create(createDto);
 
         return new ResponseDto<CreateResponseDto>({
@@ -56,7 +58,7 @@ export class CustomerController {
     @Put(':id')
     async update(
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @Body() updateDto: CreateCustomerDto,
+        @Body() updateDto: CreateOrUpdateCustomerDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         await this.customerService.updateById(id, updateDto);
 

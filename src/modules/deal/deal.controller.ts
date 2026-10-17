@@ -9,7 +9,7 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dt
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {DealService} from './deal.service';
-import {ChangeStatusDealDto, CreateDealDto, DealDto} from './dto/deal.dto';
+import {ChangeStatusDealDto, CreateOrUpdateDealDto, DealDto} from './dto/deal.dto';
 import {DealHistoryDto} from './dto/deal-history.dto';
 import {Deal} from './entities/deal.entity';
 import {DealHistory} from './entities/deal-history.entity';
@@ -30,7 +30,7 @@ export class DealController {
         const {deals, total} = await this.dealService.getList(pageNum, pageSize);
 
         return new CollectionResponseDto({
-            data: deals.map((deal) => plainToInstance(DealDto, deal)),
+            data: plainToInstance(DealDto, deals, {excludeExtraneousValues: true}),
             total,
         });
     }
@@ -42,7 +42,7 @@ export class DealController {
         const deal = await this.dealService.getById(id);
 
         return new ResponseDto({
-            data: plainToInstance(DealDto, deal),
+            data: plainToInstance(DealDto, deal, {excludeExtraneousValues: true}),
         });
     }
 
@@ -51,7 +51,7 @@ export class DealController {
     @Post()
     async create(
         @UserTokenData('id') userId: string,
-        @Body() dto: CreateDealDto,
+        @Body() dto: CreateOrUpdateDealDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         const createdId = await this.dealService.create(userId, dto);
 
@@ -65,7 +65,7 @@ export class DealController {
     @Put(':id')
     async update(
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @Body() dto: CreateDealDto,
+        @Body() dto: CreateOrUpdateDealDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         await this.dealService.updateById(id, dto);
 
@@ -102,7 +102,7 @@ export class DealController {
         const {logs, total} = await this.dealService.getDealHistoryList(pageNum, pageSize);
 
         return new CollectionResponseDto({
-            data: plainToInstance(DealHistoryDto, logs),
+            data: plainToInstance(DealHistoryDto, logs, {excludeExtraneousValues: true}),
             total,
         });
     }

@@ -3,9 +3,10 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '~/consts';
-import {getOffsetAndCheckPaginationParams} from '~/utils';
+import {getOffsetAndCheckPaginationParams} from '~/utils/helpers';
+import {updateByIdWithRelations} from '~/utils/helpers';
 
-import {CreateCustomerDto} from './dto/customer.dto';
+import {CreateOrUpdateCustomerDto} from './dto/customer.dto';
 import {Customer} from './entities/customer.entity';
 
 @Injectable()
@@ -37,14 +38,25 @@ export class CustomerService {
         return customer;
     }
 
-    async create(dto: CreateCustomerDto): Promise<string> {
+    async create(dto: CreateOrUpdateCustomerDto): Promise<string> {
         const result = await this.customerRepository.save(dto);
 
         return result.id;
     }
 
-    async updateById(id: string, dto: CreateCustomerDto): Promise<string> {
-        const result = await this.customerRepository.update(id, {...dto, updatedAt: new Date()});
+    async updateById(id: string, dto: CreateOrUpdateCustomerDto): Promise<string> {
+        const {companyId, ...restDto} = dto;
+
+        const result = await updateByIdWithRelations(
+            this.customerRepository,
+            Customer,
+            id,
+            {
+                ...restDto,
+                updatedAt: new Date(),
+            },
+            {company: companyId},
+        );
 
         if (!result.affected) {
             throw new NotFoundException(`Заказчик с ID ${id} не найден`);

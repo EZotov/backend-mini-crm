@@ -28,7 +28,7 @@ export class ExceptionsFilter implements ExceptionFilter {
             message: 'Internal Server Error',
         };
 
-        // Ошибки Http Exception
+        // Парсинг http Exception
         if (exception instanceof HttpException) {
             status = exception.getStatus();
             const response = exception.getResponse() as ErrorResponseDto | string;
@@ -41,7 +41,7 @@ export class ExceptionsFilter implements ExceptionFilter {
             }
         }
 
-        // Общие ошибки БД
+        // Парсинг ошибок драйвера БД
         if (exception instanceof QueryFailedError) {
             const dbErrorCode = exception?.driverError?.code as string;
 
@@ -51,6 +51,14 @@ export class ExceptionsFilter implements ExceptionFilter {
                     errorResponse.message = 'Запись с такими данными уже существует';
                     break;
                 }
+                case '40P01':
+                    status = HttpStatus.LOCKED;
+                    errorResponse.message = 'Запись заблокирована, попробуйте позже';
+                    break;
+                case '55P03':
+                    status = HttpStatus.REQUEST_TIMEOUT;
+                    errorResponse.message = 'Время ожидания для блокировки записи превышено, попробуйте позже';
+                    break;
                 default:
                     errorResponse.message = 'Ошибка при выполнении операции в базе';
                     break;

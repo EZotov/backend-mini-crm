@@ -1,6 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Exclude} from 'class-transformer';
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
+import {Check, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 
 export const accessAction = {
     CREATE: 'CREATE',
@@ -9,17 +9,23 @@ export const accessAction = {
 } as const;
 
 @Entity({name: 'roles'})
+@Check(`"title" = UPPER("title")`)
 export class Role {
     @ApiProperty()
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @ApiProperty()
-    @Column()
+    @Column({unique: true})
     title: string;
 
-    @ApiProperty()
-    @Column('text', {array: true, default: '{}'})
+    @ApiProperty({
+        type: 'string',
+        isArray: true,
+        description: 'Список прав доступа',
+        example: ['user:write', 'user:read'],
+    })
+    @Column('json', {default: () => "'[]'"})
     access: string[];
 
     @Exclude()

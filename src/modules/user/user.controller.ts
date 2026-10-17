@@ -28,7 +28,7 @@ export class UserController {
         const {users, total} = await this.userService.getUsersList(pageNum, pageSize);
 
         return new CollectionResponseDto<UserDto>({
-            data: users.map((user) => plainToInstance(UserDto, user)),
+            data: plainToInstance(UserDto, users, {excludeExtraneousValues: true}),
             total,
         });
     }
@@ -40,7 +40,7 @@ export class UserController {
         const user = await this.userService.getUserById(userId);
 
         return new ResponseDto({
-            data: plainToInstance(UserDto, user),
+            data: plainToInstance(UserDto, user, {excludeExtraneousValues: true}),
         });
     }
 
@@ -78,7 +78,7 @@ export class MeUserController {
         const user = await this.userService.getUserById(id);
 
         return new ResponseDto({
-            data: plainToInstance(UserDto, user),
+            data: plainToInstance(UserDto, user, {excludeExtraneousValues: true}),
         });
     }
 
@@ -101,7 +101,7 @@ export class MeUserController {
     @Put()
     async updateMyProfilePassword(
         @UserTokenData('id', ParseUUIDModifyPipe) userId: string,
-        updateDto: UpdatePasswordDto,
+        @Body() updateDto: UpdatePasswordDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         const updatedUserId = await this.userService.updatePassword(userId, updateDto);
 

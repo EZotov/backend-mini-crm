@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Type} from 'class-transformer';
+import {Expose, Type} from 'class-transformer';
 import {IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID} from 'class-validator';
 
 import {CustomerDto} from '~/modules/customer/dto/customer.dto';
@@ -8,7 +8,7 @@ import {UserDto} from '~/modules/user/dto/user.dto';
 import {DEAL_STATUS_ENUM} from '../consts';
 import type {DealStatus} from '../types';
 
-export class CreateDealDto {
+export class CreateOrUpdateDealDto {
     @ApiProperty({
         example: 'd3b07384-d113-4956-a5e2-aa59df3a8d9a',
         description: 'UUID менеджера (User)',
@@ -47,32 +47,41 @@ export class CreateDealDto {
 
 export class DealDto {
     @ApiProperty({example: 'd3b07384-d113-4956-a5e2-aa59df3a8d9a', description: 'ID сделки'})
+    @Expose()
     id: string;
 
     @ApiProperty({example: 'Контракт на поставку', description: 'Название сделки'})
+    @Expose()
     title: string;
 
     @ApiProperty({example: 150000, description: 'Бюджет сделки'})
+    @Expose()
     budget: number;
 
     @ApiProperty({enum: DEAL_STATUS_ENUM, description: 'Статус сделки'})
+    @Expose()
     status: DealStatus;
 
     @ApiProperty({example: '2026-10-15T12:00:00.000Z', description: 'Дедлайн SLA', required: false})
+    @Expose()
     slaDeadline: Date;
 
     @ApiProperty({example: false, description: 'Нарушен ли SLA'})
+    @Expose()
     isSlaViolated: boolean;
 
     @ApiProperty({type: () => UserDto, description: 'Менеджер сделки'})
+    @Expose()
     @Type(() => UserDto)
     manager: UserDto;
 
     @ApiProperty({type: () => UserDto, description: 'Автор сделки'})
+    @Expose()
     @Type(() => UserDto)
     createdBy: UserDto;
 
     @ApiProperty({type: () => CustomerDto, description: 'Клиент сделки'})
+    @Expose()
     @Type(() => CustomerDto)
     customer: CustomerDto;
 }

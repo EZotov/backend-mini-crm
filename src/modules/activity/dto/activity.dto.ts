@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Type} from 'class-transformer';
+import {Expose, Type} from 'class-transformer';
 import {IsOptional, IsString, IsUUID} from 'class-validator';
 
 import {DealDto} from '~/modules/deal/dto/deal.dto';
@@ -32,31 +32,38 @@ export class CreateOrUpdateActivityDto {
     @ApiProperty({type: UserDto, required: false})
     @IsOptional()
     @IsUUID()
-    assignedId?: UserDto;
+    assignedId?: string;
 }
 
 export class ActivityShortDto {
     @ApiProperty()
+    @Expose()
     id: string;
 
     @ApiProperty({enum: ACTIVITY_ENUM})
+    @Expose()
     type: ActivityType;
 
     @ApiProperty()
+    @Expose()
     description: string;
 
     @ApiProperty({type: 'string', format: 'date-time'})
+    @Expose()
     dueDate: Date;
 
     @ApiProperty({type: DealDto})
+    @Expose()
     @Type(() => DealDto)
     deal: DealDto;
 
     @ApiProperty({type: UserDto})
+    @Expose()
     @Type(() => UserDto)
     assigned: UserDto;
 
     @ApiProperty({type: UserDto})
+    @Expose()
     @Type(() => UserDto)
     createdBy: UserDto;
 }
@@ -67,11 +74,14 @@ export class GroupedActivityByStatusDto {
     }
 
     @ApiProperty({enum: ACTIVITY_STATUS_ENUM})
+    @Expose()
     status: ActivityStatus;
 
     @ApiProperty({type: 'integer'})
+    @Expose()
     count: number;
 
     @ApiProperty({type: ActivityShortDto, isArray: true})
+    @Expose()
     activities: ActivityShortDto[];
 }
