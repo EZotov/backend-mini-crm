@@ -8,6 +8,7 @@ import {DEFAULT_ORDER, ROLES} from '~/consts';
 import {getHashedPassword, getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
 
 import {LoginRequestDto} from '../auth/dto/auth.dto';
+import {UserListFiltersDto} from './dto/filters.dto';
 import {CreateRoleDto} from './dto/role.dto';
 import {CreateUserDto, UpdatePasswordDto, UpdateUserDto} from './dto/user.dto';
 import {Role} from './entities/role.entity';
@@ -20,7 +21,7 @@ export class UserService {
         @InjectRepository(User) private readonly userRepository: Repository<User>,
     ) {}
     // User
-    async getUsersList(pageNum: number, pageSize: number) {
+    async getUsersList(pageNum: number, pageSize: number, filters?: UserListFiltersDto) {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [users, total] = await this.userRepository.findAndCount({
@@ -28,6 +29,11 @@ export class UserService {
             skip: skipCounts,
             order: DEFAULT_ORDER,
             relations: {role: true},
+            where: {
+                role: {
+                    title: filters?.role,
+                },
+            },
         });
 
         return {

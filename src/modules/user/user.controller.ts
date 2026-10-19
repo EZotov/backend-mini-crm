@@ -9,6 +9,7 @@ import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
+import {UserListFiltersDto} from './dto/filters.dto';
 import {UpdatePasswordDto, UpdateUserDto, UserDto} from './dto/user.dto';
 import {UserService} from './user.service';
 
@@ -24,8 +25,9 @@ export class UserController {
     async getAll(
         @Query('pageNum', ParseIntPipe) pageNum: number,
         @Query('pageSize', ParseIntPipe) pageSize: number,
+        @Query() filterDto?: UserListFiltersDto,
     ): Promise<CollectionResponseDto<UserDto>> {
-        const {users, total} = await this.userService.getUsersList(pageNum, pageSize);
+        const {users, total} = await this.userService.getUsersList(pageNum, pageSize, filterDto);
 
         return new CollectionResponseDto<UserDto>({
             data: plainToInstance(UserDto, users, {excludeExtraneousValues: true}),

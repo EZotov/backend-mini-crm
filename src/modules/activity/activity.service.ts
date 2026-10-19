@@ -5,6 +5,7 @@ import {Repository} from 'typeorm';
 import {updateByIdWithRelations} from '~/utils/helpers';
 
 import {CreateOrUpdateActivityDto} from './dto/activity.dto';
+import {ActivityListFiltersDto} from './dto/filters.dto';
 import {Activity} from './entities/activity.entity';
 import type {GroupedActivityEntities} from './types';
 
@@ -12,9 +13,14 @@ import type {GroupedActivityEntities} from './types';
 export class ActivityService {
     constructor(@InjectRepository(Activity) private readonly activityRepository: Repository<Activity>) {}
 
-    async getAllByDeal(dealId: string, groupeInStatus = false) {
+    async getAllByDeal(dealId: string, groupeInStatus = false, filters?: ActivityListFiltersDto) {
         const [activities, total] = await this.activityRepository.findAndCount({
-            where: {deal: {id: dealId}},
+            where: {
+                deal: {id: dealId},
+                createdBy: {id: filters?.createdById},
+                assigned: {id: filters?.assignedId},
+                status: filters?.status,
+            },
             order: {updatedAt: 'DESC'},
             relations: {
                 deal: {

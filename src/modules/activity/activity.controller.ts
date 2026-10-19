@@ -10,6 +10,7 @@ import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {ActivityService} from './activity.service';
 import {ActivityDto, CreateOrUpdateActivityDto, GroupedActivityByStatusDto} from './dto/activity.dto';
+import {ActivityListFiltersDto} from './dto/filters.dto';
 import {Activity} from './entities/activity.entity';
 import {GroupedActivityEntities} from './types';
 
@@ -22,8 +23,11 @@ export class ActivityController {
     @ApiOperation({summary: 'Получить список задач по сделке'})
     @ApiOkModifyResponse(ActivityDto, {isArray: true})
     @Get()
-    async getAllByDeal(@Query('dealId', ParseUUIDModifyPipe) dealId: string) {
-        const {activities, total} = await this.activityService.getAllByDeal(dealId);
+    async getAllByDeal(
+        @Query('dealId', ParseUUIDModifyPipe) dealId: string,
+        @Query() filterDto?: ActivityListFiltersDto,
+    ) {
+        const {activities, total} = await this.activityService.getAllByDeal(dealId, false, filterDto);
 
         return new CollectionResponseDto({
             data: plainToInstance(ActivityDto, activities as Activity[]),

@@ -7,6 +7,7 @@ import {getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/util
 
 import {DEAL_AVAILABLE_STATUS, DEAL_STATUS} from './consts';
 import {CreateDealHistoryLogDto, CreateOrUpdateDealDto} from './dto/deal.dto';
+import {DealListFiltersDto} from './dto/filters.dto';
 import {Deal} from './entities/deal.entity';
 import {DealHistory} from './entities/deal-history.entity';
 import {SlaLog} from './entities/sla.entity';
@@ -20,7 +21,7 @@ export class DealService {
         @InjectRepository(SlaLog) private readonly dealSLALogRepository: Repository<SlaLog>,
     ) {}
 
-    async getList(pageNum: number, pageSize: number) {
+    async getList(pageNum: number, pageSize: number, filters?: DealListFiltersDto) {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
         const [deals, total] = await this.dealRepository.findAndCount({
@@ -35,6 +36,12 @@ export class DealService {
                 createdBy: {
                     role: true,
                 },
+            },
+            where: {
+                manager: {id: filters?.managerId},
+                createdBy: {id: filters?.createdById},
+                customer: {id: filters?.customerId},
+                status: filters?.status,
             },
         });
 

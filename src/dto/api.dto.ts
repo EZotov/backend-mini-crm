@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {IsArray, IsNumber, IsString} from 'class-validator';
+import {IsArray, IsNumber, IsOptional, IsString} from 'class-validator';
 
 export class PaginationDto {
     @ApiProperty()
@@ -42,4 +42,16 @@ export class CollectionResponseDto<T> {
     @ApiProperty()
     @IsNumber()
     total: number;
+}
+
+export class GetRequestBaseQuery extends PaginationDto {
+    @ApiProperty({required: false, example: 'title'})
+    @IsString()
+    @IsOptional()
+    sortedBy?: string;
+
+    @ApiProperty({required: false, example: 'ASC'})
+    @IsString()
+    @IsOptional()
+    sortDirection?: 'ASC' | 'DESC';
 }

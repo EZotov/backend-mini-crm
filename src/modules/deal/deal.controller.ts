@@ -11,6 +11,7 @@ import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 import {DealService} from './deal.service';
 import {ChangeStatusDealDto, CreateOrUpdateDealDto, DealDto} from './dto/deal.dto';
 import {DealHistoryDto} from './dto/deal-history.dto';
+import {DealListFiltersDto} from './dto/filters.dto';
 import {Deal} from './entities/deal.entity';
 import {DealHistory} from './entities/deal-history.entity';
 
@@ -26,8 +27,9 @@ export class DealController {
     async getAll(
         @Query('pageNum', ParseIntPipe) pageNum: number,
         @Query('pageSize', ParseIntPipe) pageSize: number,
+        @Query() filtersDto?: DealListFiltersDto,
     ): Promise<CollectionResponseDto<DealDto>> {
-        const {deals, total} = await this.dealService.getList(pageNum, pageSize);
+        const {deals, total} = await this.dealService.getList(pageNum, pageSize, filtersDto);
 
         return new CollectionResponseDto({
             data: plainToInstance(DealDto, deals, {excludeExtraneousValues: true}),
