@@ -9,7 +9,7 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dt
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {ActivityService} from './activity.service';
-import {CreateOrUpdateActivityDto, GroupedActivityByStatusDto} from './dto/activity.dto';
+import {ActivityDto, CreateOrUpdateActivityDto, GroupedActivityByStatusDto} from './dto/activity.dto';
 import {Activity} from './entities/activity.entity';
 import {GroupedActivityEntities} from './types';
 
@@ -20,13 +20,13 @@ export class ActivityController {
     constructor(private readonly activityService: ActivityService) {}
 
     @ApiOperation({summary: 'Получить список задач по сделке'})
-    @ApiOkModifyResponse(Activity, {isArray: true})
+    @ApiOkModifyResponse(ActivityDto, {isArray: true})
     @Get()
     async getAllByDeal(@Query('dealId', ParseUUIDModifyPipe) dealId: string) {
         const {activities, total} = await this.activityService.getAllByDeal(dealId);
 
         return new CollectionResponseDto({
-            data: activities as Activity[],
+            data: plainToInstance(ActivityDto, activities as Activity[]),
             total,
         });
     }

@@ -27,6 +27,15 @@ export class DealService {
             take: pageSize,
             skip: skipCounts,
             order: DEFAULT_ORDER,
+            relations: {
+                customer: true,
+                manager: {
+                    role: true,
+                },
+                createdBy: {
+                    role: true,
+                },
+            },
         });
 
         return {
@@ -36,7 +45,18 @@ export class DealService {
     }
 
     async getById(id: string): Promise<Deal> {
-        const deal = await this.dealRepository.findOne({where: {id}});
+        const deal = await this.dealRepository.findOne({
+            where: {id},
+            relations: {
+                customer: true,
+                manager: {
+                    role: true,
+                },
+                createdBy: {
+                    role: true,
+                },
+            },
+        });
 
         if (!deal) {
             throw new NotFoundException(`Сделка по ${id} не найдена`);

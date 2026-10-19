@@ -33,7 +33,7 @@ export class User {
     @Column({name: 'first_name', nullable: true})
     firstName: string;
 
-    @ApiProperty({required: false, nullable: true})
+    @ApiProperty({type: 'string', required: false, nullable: true})
     @Column({type: 'varchar', nullable: true})
     patronymic: string | null;
 

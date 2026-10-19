@@ -32,7 +32,12 @@ export class CustomerService {
     }
 
     async getById(customerId: string): Promise<Customer> {
-        const customer = await this.customerRepository.findOneBy({id: customerId});
+        const customer = await this.customerRepository.findOne({
+            where: {id: customerId},
+            relations: {
+                company: true,
+            },
+        });
 
         if (!customer) {
             throw new NotFoundException('Заказчик не найден');

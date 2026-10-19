@@ -1,4 +1,4 @@
-import {ApiProperty} from '@nestjs/swagger';
+import {ApiProperty, OmitType} from '@nestjs/swagger';
 import {Expose, Type} from 'class-transformer';
 import {IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID} from 'class-validator';
 
@@ -76,6 +76,8 @@ export class DealDto {
     @Type(() => CustomerDto)
     customer: CustomerDto;
 }
+
+export class DealShortDto extends OmitType(DealDto, ['createdBy']) {}
 
 export class ChangeStatusDealDto {
     @ApiProperty({

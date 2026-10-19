@@ -54,12 +54,12 @@ export class ActivityService {
         return {activities, total};
     }
 
-    async create(userId: string, dto: CreateOrUpdateActivityDto) {
+    async create(userId: string, dto: CreateOrUpdateActivityDto): Promise<string> {
         const {dealId, assignedId, ...restDto} = dto;
 
         const activity = await this.activityRepository.save({
             ...restDto,
-            assigned: {id: assignedId},
+            assigned: assignedId ? {id: assignedId} : undefined,
             deal: {id: dealId},
             createdBy: {id: userId},
         });
