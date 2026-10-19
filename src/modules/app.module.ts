@@ -3,6 +3,8 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {RedisModule} from '@nestjs-modules/ioredis';
 
+import {ENV_KEYS_CONFIG} from '~/configs/env';
+
 import getDBConfig from '../configs/db/options';
 import {ActivityModule} from './activity/activity.module';
 import {AnalyticsModule} from './analytics/analytics.module';
@@ -25,7 +27,7 @@ import {UserModule} from './user/user.module';
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
                 type: 'single',
-                url: configService.get<string>('REDIS_URL'),
+                url: configService.get<string>(ENV_KEYS_CONFIG.REDIS_URL),
                 options: {
                     maxRetriesPerRequest: 0,
                     disconnectTimeout: 1000,

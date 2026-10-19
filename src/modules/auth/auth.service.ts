@@ -11,6 +11,7 @@ import {InjectRedis} from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 
 import {JwtPayload} from '@interfaces/auth.interface';
+import {ENV_KEYS_CONFIG} from '~/configs/env';
 import {combineUserSessionKey} from '~/utils/helpers';
 
 import {CreateUserDto} from '../user/dto/user.dto';
@@ -68,11 +69,11 @@ export class AuthService {
 
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(payload, {
-                secret: this.configService.get('JWT_ACCESS_SECRET'),
-                expiresIn: this.configService.get('JWT_ACCESS_EXPIRES'),
+                secret: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_SECRET),
+                expiresIn: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_EXPIRES),
             }),
             this.jwtService.signAsync(payload, {
-                secret: this.configService.get('JWT_REFRESH_SECRET'),
+                secret: this.configService.get(ENV_KEYS_CONFIG.JWT_REFRESH_SECRET),
                 expiresIn: '1d',
             }),
         ]);
@@ -91,8 +92,8 @@ export class AuthService {
         }
 
         const accessToken = await this.jwtService.signAsync(payload, {
-            secret: this.configService.get('JWT_ACCESS_SECRET'),
-            expiresIn: this.configService.get('JWT_ACCESS_EXPIRES'),
+            secret: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_SECRET),
+            expiresIn: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_EXPIRES),
         });
 
         return accessToken;
