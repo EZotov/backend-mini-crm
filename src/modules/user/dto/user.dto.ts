@@ -44,10 +44,10 @@ export class UpdateUserDto {
     @IsString()
     firstName: string;
 
-    @ApiProperty({required: false})
+    @ApiProperty({required: false, nullable: true})
     @IsString()
     @IsOptional()
-    patronymic?: string;
+    patronymic?: string | null;
 
     @ApiProperty()
     @IsString()

@@ -20,6 +20,9 @@ export class CustomerService {
             skip: skipCounts,
             take: pageSize,
             order: DEFAULT_ORDER,
+            relations: {
+                company: true,
+            },
         });
 
         return {
@@ -39,23 +42,24 @@ export class CustomerService {
     }
 
     async create(dto: CreateOrUpdateCustomerDto): Promise<string> {
-        const result = await this.customerRepository.save(dto);
+        const {companyId, ...restDto} = dto;
+
+        const result = await this.customerRepository.save({...restDto, company: {id: companyId}});
 
         return result.id;
     }
 
     async updateById(id: string, dto: CreateOrUpdateCustomerDto): Promise<string> {
-        const {companyId, ...restDto} = dto;
+        const {companyId, patronymic = null, ...restDto} = dto;
 
         const result = await updateByIdWithRelations(
             this.customerRepository,
             Customer,
             id,
+            {...restDto, patronymic},
             {
-                ...restDto,
-                updatedAt: new Date(),
+                company: companyId,
             },
-            {company: companyId},
         );
 
         if (!result.affected) {

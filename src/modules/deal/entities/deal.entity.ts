@@ -10,7 +10,6 @@ import {
     UpdateDateColumn,
 } from 'typeorm';
 
-import {Company} from '~/modules/company/entities/company.entity';
 import {Customer} from '~/modules/customer/entities/customer.entity';
 import {User} from '~/modules/user/entities/user.entity';
 
@@ -60,11 +59,6 @@ export class Deal {
     @ManyToOne(() => User)
     @JoinColumn({name: 'created_by_id'})
     createdBy: User;
-
-    @ApiProperty({type: () => Company})
-    @ManyToOne(() => Company)
-    @JoinColumn({name: 'company_id'})
-    company: Company;
 
     @ApiProperty({type: () => Customer})
     @ManyToOne(() => Customer)

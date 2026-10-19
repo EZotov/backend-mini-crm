@@ -1,5 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Exclude} from 'class-transformer';
+import {Exclude, Expose} from 'class-transformer';
+import {IsString} from 'class-validator';
 import {
     Column,
     CreateDateColumn,
@@ -15,18 +16,25 @@ import {User} from '~/modules/user/entities/user.entity';
 @Entity({name: 'company'})
 export class Company {
     @ApiProperty()
+    @Expose()
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @ApiProperty()
+    @IsString()
+    @Expose()
     @Column({name: 'full_title'})
     fullTitle: string;
 
     @ApiProperty()
+    @IsString()
+    @Expose()
     @Column({name: 'short_title', nullable: true})
     shortTitle: string;
 
     @ApiProperty()
+    @IsString()
+    @Expose()
     @Column({nullable: true})
     inn: string;
 

@@ -46,8 +46,12 @@ export class DealService {
     }
 
     async create(userId: string, dto: CreateOrUpdateDealDto): Promise<string> {
+        const {managerId, customerId, ...restDto} = dto;
+
         const result = await this.dealRepository.save({
-            ...dto,
+            ...restDto,
+            manager: {id: managerId},
+            customer: {id: customerId},
             createdBy: {id: userId},
             slaDeadline: new Date(new Date().getTime() + 30 * 60 * 1000),
         });
@@ -56,10 +60,9 @@ export class DealService {
     }
 
     async updateById(id: string, dto: CreateOrUpdateDealDto): Promise<string> {
-        const {customerId, managerId, companyId, ...flatDto} = dto;
+        const {customerId, managerId, ...flatDto} = dto;
 
         const result = await updateByIdWithRelations(this.dealRepository, Deal, id, flatDto, {
-            company: companyId,
             manager: managerId,
             customer: customerId,
         });

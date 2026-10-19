@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Exclude} from 'class-transformer';
+import {Exclude, Expose} from 'class-transformer';
 import {
     Column,
     CreateDateColumn,
@@ -15,22 +15,27 @@ import {Company} from '../../company/entities/company.entity';
 @Entity({name: 'customers'})
 export class Customer {
     @ApiProperty()
+    @Expose()
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @ApiProperty()
+    @Expose()
     @Column({name: 'last_name'})
     lastName: string;
 
     @ApiProperty({nullable: true})
-    @Column({nullable: true})
-    patronymic: string;
+    @Expose()
+    @Column({type: 'varchar', nullable: true})
+    patronymic: string | null;
 
     @ApiProperty()
+    @Expose()
     @Column({name: 'first_name'})
     firstName: string;
 
     @ApiProperty()
+    @Expose()
     @Column({unique: true})
     phone: string;
 
@@ -42,8 +47,9 @@ export class Customer {
     @UpdateDateColumn({name: 'updated_at'})
     updatedAt: Date;
 
+    @ApiProperty({type: Company})
+    @Expose()
     @ManyToOne(() => Company)
-    @Exclude()
     @JoinColumn({name: 'company_id'})
     company: Company;
 }

@@ -1,6 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Expose, Type} from 'class-transformer';
-import {IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID} from 'class-validator';
+import {IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID} from 'class-validator';
 
 import {CustomerDto} from '~/modules/customer/dto/customer.dto';
 import {UserDto} from '~/modules/user/dto/user.dto';
@@ -16,15 +16,6 @@ export class CreateOrUpdateDealDto {
     @IsUUID()
     @IsNotEmpty()
     managerId: string;
-
-    @ApiProperty({
-        example: 'e4f08384-c224-4956-b6f3-bb59df3a8d9b',
-        description: 'UUID компании',
-        required: false,
-    })
-    @IsUUID()
-    @IsOptional()
-    companyId?: string;
 
     @ApiProperty({
         example: 'a1b07384-f334-4956-c7d4-cc59df3a8d9c',

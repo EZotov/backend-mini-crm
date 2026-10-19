@@ -56,11 +56,11 @@ export class Activity {
     deal: Deal;
 
     // На кого назначена
-    @ApiProperty({type: UserDto})
+    @ApiProperty({type: UserDto, nullable: true})
     @Type(() => UserDto)
     @OneToOne(() => User, {onDelete: 'SET NULL'})
     @JoinColumn({name: 'assigned_id'})
-    assigned: User;
+    assigned: User | null;
 
     // Тот кто создал
     @ApiProperty({type: UserDto})

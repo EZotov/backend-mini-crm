@@ -55,7 +55,14 @@ export class ActivityService {
     }
 
     async create(userId: string, dto: CreateOrUpdateActivityDto) {
-        const activity = await this.activityRepository.save({...dto, createdBy: {id: userId}});
+        const {dealId, assignedId, ...restDto} = dto;
+
+        const activity = await this.activityRepository.save({
+            ...restDto,
+            assigned: {id: assignedId},
+            deal: {id: dealId},
+            createdBy: {id: userId},
+        });
 
         return activity.id;
     }

@@ -1,18 +1,23 @@
 import {ApiProperty, OmitType} from '@nestjs/swagger';
-import {IsMobilePhone, IsString, IsUUID} from 'class-validator';
+import {IsMobilePhone, IsOptional, IsString, IsUUID} from 'class-validator';
 
 import {Customer} from '../entities/customer.entity';
 
-export class CustomerDto extends OmitType(Customer, ['updatedAt', 'createdAt', 'company']) {}
+export class CustomerDto extends OmitType(Customer, ['updatedAt', 'createdAt']) {}
 
 export class CreateOrUpdateCustomerDto {
     @ApiProperty()
     @IsString()
-    fullTitle: string;
+    lastName: string;
+
+    @ApiProperty({required: false, nullable: true})
+    @IsString()
+    @IsOptional()
+    patronymic?: string | null;
 
     @ApiProperty()
     @IsString()
-    shortTitle: string;
+    firstName: string;
 
     @ApiProperty()
     @IsString()
