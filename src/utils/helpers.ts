@@ -47,9 +47,7 @@ export const setRefreshTokenInCookie = (res: Response, token: string, options?: 
  * @param res
  * @param options
  */
-export const clearRefreshTokenCookie = (res: Response, options: CookieOptions) => {
-    const isProduction = options?.isProduction ?? true;
-
+export const clearRefreshTokenCookie = (res: Response, isProduction: CookieOptions['isProduction'] = true) => {
     res.clearCookie(REFRESH_TOKEN_KEY, {
         httpOnly: true,
         secure: isProduction,
@@ -124,3 +122,5 @@ export const updateByIdWithRelations = async <T extends ObjectLiteral>(
 
     return repository.createQueryBuilder().update(entity).set(setData).where('id = :id', {id}).execute();
 };
+
+export const combineUserSessionKey = (userId: string) => `user:session:id:${userId}`;

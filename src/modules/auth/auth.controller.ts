@@ -6,6 +6,7 @@ import type {Request, Response} from 'express';
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {AuthProtected} from '@decorators/auth.decorator';
 import {Cookie} from '@decorators/cookie.decorator';
+import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {ResponseDto} from '@dto/api.dto';
 import {clearRefreshTokenCookie, setRefreshTokenInCookie} from '~/utils/helpers';
 
@@ -101,7 +102,7 @@ export class AuthController {
                 data: new RefreshAccessTokenDto({accessToken}),
             });
         } catch (error) {
-            clearRefreshTokenCookie(res, {isProduction: this.isProduction});
+            clearRefreshTokenCookie(res, this.isProduction);
             throw error;
         }
     }
@@ -110,7 +111,9 @@ export class AuthController {
     @ApiOkModifyResponse()
     @AuthProtected()
     @Post('logout')
-    logout(): ResponseDto<string> {
-        return {data: 'Not implemented'};
+    async logout(@UserTokenData('id') userId: string, @Res({passthrough: true}) res: Response): Promise<void> {
+        await this.authService.logout(userId);
+
+        clearRefreshTokenCookie(res, this.isProduction);
     }
 }

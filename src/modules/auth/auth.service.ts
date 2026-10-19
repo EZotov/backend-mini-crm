@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Injectable,
     InternalServerErrorException,
     ServiceUnavailableException,
@@ -10,6 +11,7 @@ import {InjectRedis} from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 
 import {JwtPayload} from '@interfaces/auth.interface';
+import {combineUserSessionKey} from '~/utils/helpers';
 
 import {CreateUserDto} from '../user/dto/user.dto';
 import {UserService} from '../user/user.service';
@@ -49,7 +51,15 @@ export class AuthService {
         };
     }
 
-    async logout() {}
+    async logout(userId: string) {
+        const isExist = await this.checkSession(userId);
+
+        if (!isExist) {
+            throw new BadRequestException('Сессия пользователя не найдена');
+        }
+
+        await this.deleteSession(userId);
+    }
 
     async generateAuthTokensByUserId(userId: string): Promise<{accessToken: string; refreshToken: string}> {
         const payload: JwtPayload = {
@@ -91,7 +101,7 @@ export class AuthService {
     // Sessions
 
     async checkSession(userId: string): Promise<boolean> {
-        const key = `user:session:id:${userId}`;
+        const key = combineUserSessionKey(userId);
 
         try {
             const result = await this.redisService.exists(key);
@@ -104,7 +114,7 @@ export class AuthService {
     }
 
     async getSession(userId: string): Promise<SessionData | null> {
-        const key = `user:session:id:${userId}`;
+        const key = combineUserSessionKey(userId);
 
         try {
             const result = await this.redisService.hgetall(key);
@@ -121,7 +131,7 @@ export class AuthService {
     }
 
     async saveSession(data: SessionData) {
-        const key = `user:session:id:${data.userId}`;
+        const key = combineUserSessionKey(data.userId);
 
         try {
             const pipeline = this.redisService.pipeline();
@@ -143,7 +153,7 @@ export class AuthService {
     }
 
     async deleteSession(userId: string): Promise<void> {
-        const key = `user:session:id:${userId}`;
+        const key = combineUserSessionKey(userId);
 
         await this.redisService.del(key);
     }
