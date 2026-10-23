@@ -14,7 +14,7 @@ import {Company} from '../../company/entities/company.entity';
 
 @Entity({name: 'customers'})
 export class Customer {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @Expose()
     @PrimaryGeneratedColumn('uuid')
     id: string;

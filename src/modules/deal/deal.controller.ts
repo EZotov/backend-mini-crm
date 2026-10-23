@@ -13,7 +13,6 @@ import {ChangeStatusDealDto, CreateOrUpdateDealDto, DealDto} from './dto/deal.dt
 import {DealHistoryDto} from './dto/deal-history.dto';
 import {DealListFiltersDto} from './dto/filters.dto';
 import {Deal} from './entities/deal.entity';
-import {DealHistory} from './entities/deal-history.entity';
 
 @ApiTags('Сделки')
 @AuthProtected()
@@ -107,8 +106,8 @@ export class DealController {
     }
 
     @ApiOperation({summary: 'Получить историю по сделке'})
-    @ApiOkModifyResponse(DealHistory)
-    @Get(':id')
+    @ApiOkModifyResponse(DealHistoryDto, {isArray: true})
+    @Get(':id/history')
     async getDealHistory(
         @Param('id', ParseUUIDModifyPipe) id: string,
         @Query('pageNum', ParseIntPipe) pageNum: number,

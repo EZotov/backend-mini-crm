@@ -17,7 +17,7 @@ import {Role} from './role.entity';
 @Entity({name: 'users'})
 @Index('USER_EMAIL_ACTIVE', ['email'], {unique: true, where: '"deleted_at" IS NULL'})
 export class User {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

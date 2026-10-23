@@ -15,7 +15,7 @@ import {Deal} from '~/modules/deal/entities/deal.entity';
 
 @Entity('sla_logs')
 export class SlaLog {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

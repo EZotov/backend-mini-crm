@@ -39,7 +39,12 @@ export class CreateOrUpdateDealDto {
 }
 
 export class DealDto {
-    @ApiProperty({example: 'd3b07384-d113-4956-a5e2-aa59df3a8d9a', description: 'ID сделки'})
+    @ApiProperty({
+        type: 'string',
+        format: 'uuid',
+        example: 'd3b07384-d113-4956-a5e2-aa59df3a8d9a',
+        description: 'ID сделки',
+    })
     @Expose()
     id: string;
 
@@ -78,7 +83,7 @@ export class DealDto {
     @Type(() => CustomerDto)
     customer: CustomerDto;
 
-    @ApiProperty({type: () => UserDto, description: 'Воронка'})
+    @ApiProperty({type: () => Funnel, description: 'Воронка'})
     @Expose()
     funnel: Funnel;
 

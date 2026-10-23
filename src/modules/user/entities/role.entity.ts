@@ -11,7 +11,7 @@ export const accessAction = {
 @Entity({name: 'roles'})
 @Check(`"title" = UPPER("title")`)
 export class Role {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

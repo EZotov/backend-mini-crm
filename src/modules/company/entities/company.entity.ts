@@ -15,7 +15,7 @@ import {User} from '~/modules/user/entities/user.entity';
 
 @Entity({name: 'company'})
 export class Company {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @Expose()
     @PrimaryGeneratedColumn('uuid')
     id: string;

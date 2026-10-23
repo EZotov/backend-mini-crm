@@ -19,7 +19,7 @@ import type {DealStatus} from '../types';
 
 @Entity({name: 'deals'})
 export class Deal {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

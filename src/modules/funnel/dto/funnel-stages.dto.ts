@@ -1,18 +1,23 @@
-import {Column, PrimaryGeneratedColumn} from 'typeorm';
+import {ApiProperty} from '@nestjs/swagger';
+import {Expose} from 'class-transformer';
 
 import {FUNNEL_STAGE_TYPE_ENUM} from '~/modules/deal/consts';
 import type {FunnelStageType} from '~/modules/deal/types';
 
 export class FunnelStagesDto {
-    @PrimaryGeneratedColumn('uuid')
+    @ApiProperty({type: 'string', format: 'uuid'})
+    @Expose()
     id: string;
 
-    @Column({type: 'varchar'})
+    @ApiProperty()
+    @Expose()
     title: string;
 
-    @Column({type: 'int'})
+    @ApiProperty({type: 'number'})
+    @Expose()
     order: number;
 
-    @Column({type: 'varchar', enum: FUNNEL_STAGE_TYPE_ENUM})
+    @ApiProperty({type: 'string', enum: FUNNEL_STAGE_TYPE_ENUM})
+    @Expose()
     type: FunnelStageType;
 }

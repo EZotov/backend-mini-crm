@@ -21,7 +21,7 @@ import type {ActivityStatus, ActivityType} from '../types';
 
 @Entity('activities')
 export class Activity {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

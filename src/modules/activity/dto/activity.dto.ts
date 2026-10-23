@@ -36,7 +36,7 @@ export class CreateOrUpdateActivityDto {
 }
 
 export class ActivityDto {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @Expose()
     id: string;
 

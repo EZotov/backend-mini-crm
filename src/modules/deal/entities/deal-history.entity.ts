@@ -5,7 +5,7 @@ import {Deal} from './deal.entity';
 
 @Entity('deal_history')
 export class DealHistory {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @PrimaryGeneratedColumn('uuid')
     id: string;
 

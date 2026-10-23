@@ -81,7 +81,7 @@ export class UpdatePasswordDto {
 }
 
 export class UserDto {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @Expose()
     id: string;
 

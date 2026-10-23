@@ -1,10 +1,8 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Expose, Type} from 'class-transformer';
-
-import {DealDto} from './deal.dto';
+import {Expose, Transform} from 'class-transformer';
 
 export class DealHistoryDto {
-    @ApiProperty()
+    @ApiProperty({type: 'string', format: 'uuid'})
     @Expose()
     id: string;
 
@@ -24,8 +22,8 @@ export class DealHistoryDto {
     @Expose()
     createdAt: Date;
 
-    @ApiProperty({type: DealDto})
+    @ApiProperty({type: 'string', format: 'uuid', example: 'UUID сделки'})
     @Expose()
-    @Type(() => DealDto)
-    deal: DealDto;
+    @Transform(({obj}) => obj?.deal?.id)
+    dealId: string;
 }
