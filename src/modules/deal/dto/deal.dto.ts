@@ -3,6 +3,8 @@ import {Expose, Type} from 'class-transformer';
 import {IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID} from 'class-validator';
 
 import {CustomerDto} from '~/modules/customer/dto/customer.dto';
+import {FunnelStagesDto} from '~/modules/funnel/dto/funnel-stages.dto';
+import {Funnel} from '~/modules/funnel/entities/funnel.entity';
 import {UserDto} from '~/modules/user/dto/user.dto';
 
 import {DEAL_STATUS_ENUM} from '../consts';
@@ -75,6 +77,15 @@ export class DealDto {
     @Expose()
     @Type(() => CustomerDto)
     customer: CustomerDto;
+
+    @ApiProperty({type: () => UserDto, description: 'Воронка'})
+    @Expose()
+    funnel: Funnel;
+
+    @ApiProperty({type: () => FunnelStagesDto, description: 'Этап воронки'})
+    @Expose()
+    @Type(() => FunnelStagesDto)
+    currentFunnelStage: FunnelStagesDto;
 }
 
 export class DealShortDto extends OmitType(DealDto, ['createdBy']) {}
@@ -88,6 +99,16 @@ export class ChangeStatusDealDto {
     @IsEnum(DEAL_STATUS_ENUM)
     @IsNotEmpty()
     status: DealStatus;
+}
+
+export class ChangeDealFunnelStage {
+    @ApiProperty({
+        example: 'a1b07384-f334-4956-c7d4-cc59df3a8d9c',
+        description: 'UUID этапа воронки',
+    })
+    @IsUUID('4')
+    @IsNotEmpty()
+    currentFunnelStage: string;
 }
 
 export class CreateDealHistoryLogDto {

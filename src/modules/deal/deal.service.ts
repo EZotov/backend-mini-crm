@@ -31,6 +31,9 @@ export class DealService {
             order: DEFAULT_ORDER,
             relations: {
                 customer: true,
+                currentFunnelStage: {
+                    funnel: true,
+                },
                 manager: {
                     role: true,
                 },
@@ -57,6 +60,9 @@ export class DealService {
             where: {id},
             relations: {
                 customer: true,
+                currentFunnelStage: {
+                    funnel: true,
+                },
                 manager: {
                     role: true,
                 },

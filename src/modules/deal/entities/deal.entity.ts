@@ -67,7 +67,7 @@ export class Deal {
     customer: Customer;
 
     @ApiProperty({type: () => FunnelStages})
-    @ManyToOne(() => FunnelStages)
+    @ManyToOne(() => FunnelStages, {onDelete: 'SET NULL'})
     @JoinColumn({name: 'funnel_stage_id'})
     currentFunnelStage: FunnelStages;
 }

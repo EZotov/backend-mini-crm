@@ -91,6 +91,21 @@ export class DealController {
         });
     }
 
+    @ApiOperation({summary: 'Изменить этап воронки сделки'})
+    @ApiOkModifyResponse(CreateResponseDto)
+    @Patch(':id')
+    changeFunnelStage(
+        @Param('id', ParseUUIDModifyPipe) id: string,
+        @UserTokenData('id') currentUserid: string,
+        @Body() dto: ChangeStatusDealDto,
+    ): ResponseDto<string> {
+        this.dealService.updateStatusById(id, currentUserid, dto.status);
+
+        return new ResponseDto({
+            data: 'Not implemented',
+        });
+    }
+
     @ApiOperation({summary: 'Получить историю по сделке'})
     @ApiOkModifyResponse(DealHistory)
     @Get(':id')
