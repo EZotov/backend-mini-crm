@@ -104,10 +104,15 @@ export class DealService {
     }
 
     async updateStatusById(id: string, currentUserid: string, status: DealStatus): Promise<string> {
+        const changedByUser = await this.userService.getUserById(currentUserid);
+
         return this.dealRepository.manager.transaction(async (entityManager) => {
             const currentDeal = await entityManager.findOne(Deal, {
                 where: {id},
                 lock: {mode: 'pessimistic_write'},
+                relations: {
+                    manager: true,
+                },
             });
 
             if (!currentDeal) {
@@ -119,8 +124,6 @@ export class DealService {
             }
 
             let isSlaViolated: boolean = false;
-
-            const manager = await this.userService.getUserById(currentDeal.manager.id);
 
             // Отслеживаем SLA при смене NEW на IN_PROGRESS статуса
             if (
@@ -136,13 +139,13 @@ export class DealService {
                 const overdueMinutes = Math.floor(timeDiffMs / (1000 * 60));
 
                 // Создаём SLA Log
-                await this.dealSLALogRepository.save({
+                await entityManager.save(SlaLog, {
                     deal: {id: currentDeal.id},
                     managerId: currentDeal.manager.id,
                     managerFullname: getFullName({
-                        firstName: manager.firstName,
-                        lastName: manager.lastName,
-                        patronymic: manager.patronymic,
+                        firstName: currentDeal.manager.firstName,
+                        lastName: currentDeal.manager.lastName,
+                        patronymic: currentDeal.manager.patronymic,
                     }),
                     minutesOverdue: overdueMinutes,
                 });
@@ -152,8 +155,6 @@ export class DealService {
 
             // Обновляем статус сделки
             await entityManager.update(Deal, id, {status, isSlaViolated});
-
-            const changedByUser = await this.userService.getUserById(currentUserid);
 
             // Пишем лог в историю
             await this.createHistoryLog(
