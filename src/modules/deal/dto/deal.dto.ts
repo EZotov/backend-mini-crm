@@ -126,9 +126,5 @@ export class CreateDealHistoryLogDto {
 
     @ApiProperty()
     @IsString()
-    fromStatus: DealStatus;
-
-    @ApiProperty()
-    @IsString()
-    toStatus: DealStatus;
+    actionDescription: string;
 }

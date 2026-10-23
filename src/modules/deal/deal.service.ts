@@ -171,8 +171,7 @@ export class DealService {
                         patronymic: changedByUser.patronymic,
                     }),
                     dealId: id,
-                    fromStatus: currentDeal.status,
-                    toStatus: status,
+                    actionDescription: `Смена статуса сделки с ${currentDeal.status} на ${status}`,
                 },
                 entityManager,
             );
@@ -205,23 +204,21 @@ export class DealService {
     }
 
     async createHistoryLog(dto: CreateDealHistoryLogDto, entityManager?: EntityManager): Promise<string> {
-        const {fromStatus, toStatus, dealId, changedByFullname, changedById} = dto;
+        const {actionDescription, dealId, changedByFullname, changedById} = dto;
 
         let result: DealHistory;
 
         // Сделать лог в рамках транзакции извне
         if (entityManager) {
             result = await entityManager.save(DealHistory, {
-                fromStatus,
-                toStatus,
+                actionDescription,
                 deal: {id: dealId},
                 changedByFullname,
                 changedById,
             });
         } else {
             result = await this.dealHistoryRepository.save({
-                fromStatus,
-                toStatus,
+                actionDescription,
                 changedByFullname,
                 changedById,
             });

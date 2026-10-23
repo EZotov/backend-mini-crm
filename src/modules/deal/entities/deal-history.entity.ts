@@ -1,8 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 
-import {DEAL_STATUS_ENUM} from '../consts';
-import type {DealStatus} from '../types';
 import {Deal} from './deal.entity';
 
 @Entity('deal_history')
@@ -11,13 +9,9 @@ export class DealHistory {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ApiProperty({enum: DEAL_STATUS_ENUM})
-    @Column({name: 'form_status', enum: DEAL_STATUS_ENUM})
-    fromStatus: DealStatus;
-
-    @ApiProperty({enum: DEAL_STATUS_ENUM})
-    @Column({name: 'to_status', enum: DEAL_STATUS_ENUM})
-    toStatus: DealStatus;
+    @ApiProperty()
+    @Column({name: 'action_description', type: 'varchar'})
+    actionDescription: string;
 
     @ApiProperty({type: 'string', nullable: true})
     @Column({name: 'changed_by_id', type: 'uuid', nullable: true})
