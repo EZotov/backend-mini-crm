@@ -41,6 +41,10 @@ export class User {
     @Column({name: 'last_name', nullable: true})
     lastName: string;
 
+    @ApiProperty()
+    @Column({name: 'is_blocked', type: 'boolean', default: false})
+    isBlocked: boolean;
+
     @Exclude()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;

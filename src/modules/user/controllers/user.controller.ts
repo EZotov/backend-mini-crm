@@ -9,9 +9,9 @@ import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
-import {UserListFiltersDto} from './dto/filters.dto';
-import {UpdatePasswordDto, UpdateUserDto, UserDto} from './dto/user.dto';
-import {UserService} from './user.service';
+import {UserListFiltersDto} from '../dto/filters.dto';
+import {UpdatePasswordDto, UpdateUserDto, UserDto} from '../dto/user.dto';
+import {UserService} from '../user.service';
 
 @ApiTags('Пользователи')
 @AuthProtected(ROLES.ADMIN)

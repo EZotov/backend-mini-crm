@@ -3,8 +3,9 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {EntityManager, Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '@consts/index';
-import {getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
+import {getFullName, getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
 
+import {UserService} from '../user/user.service';
 import {DEAL_AVAILABLE_STATUS, DEAL_STATUS} from './consts';
 import {CreateDealHistoryLogDto, CreateOrUpdateDealDto} from './dto/deal.dto';
 import {DealListFiltersDto} from './dto/filters.dto';
@@ -19,6 +20,7 @@ export class DealService {
         @InjectRepository(Deal) private readonly dealRepository: Repository<Deal>,
         @InjectRepository(DealHistory) private readonly dealHistoryRepository: Repository<DealHistory>,
         @InjectRepository(SlaLog) private readonly dealSLALogRepository: Repository<SlaLog>,
+        private readonly userService: UserService,
     ) {}
 
     async getList(pageNum: number, pageSize: number, filters?: DealListFiltersDto) {
@@ -101,7 +103,7 @@ export class DealService {
         return id;
     }
 
-    async updateStatusById(id: string, createdById: string, status: DealStatus): Promise<string> {
+    async updateStatusById(id: string, currentUserid: string, status: DealStatus): Promise<string> {
         return this.dealRepository.manager.transaction(async (entityManager) => {
             const currentDeal = await entityManager.findOne(Deal, {
                 where: {id},
@@ -117,6 +119,8 @@ export class DealService {
             }
 
             let isSlaViolated: boolean = false;
+
+            const manager = await this.userService.getUserById(currentDeal.manager.id);
 
             // Отслеживаем SLA при смене NEW на IN_PROGRESS статуса
             if (
@@ -134,7 +138,12 @@ export class DealService {
                 // Создаём SLA Log
                 await this.dealSLALogRepository.save({
                     deal: {id: currentDeal.id},
-                    manager: {id: currentDeal.manager.id},
+                    managerId: currentDeal.manager.id,
+                    managerFullname: getFullName({
+                        firstName: manager.firstName,
+                        lastName: manager.lastName,
+                        patronymic: manager.patronymic,
+                    }),
                     minutesOverdue: overdueMinutes,
                 });
 
@@ -144,10 +153,17 @@ export class DealService {
             // Обновляем статус сделки
             await entityManager.update(Deal, id, {status, isSlaViolated});
 
+            const changedByUser = await this.userService.getUserById(currentUserid);
+
             // Пишем лог в историю
             await this.createHistoryLog(
                 {
-                    createdById,
+                    changedById: currentUserid,
+                    changedByFullname: getFullName({
+                        firstName: changedByUser.firstName,
+                        lastName: changedByUser.lastName,
+                        patronymic: changedByUser.patronymic,
+                    }),
                     dealId: id,
                     fromStatus: currentDeal.status,
                     toStatus: status,
@@ -183,7 +199,7 @@ export class DealService {
     }
 
     async createHistoryLog(dto: CreateDealHistoryLogDto, entityManager?: EntityManager): Promise<string> {
-        const {fromStatus, toStatus, dealId, createdById} = dto;
+        const {fromStatus, toStatus, dealId, changedByFullname, changedById} = dto;
 
         let result: DealHistory;
 
@@ -193,14 +209,15 @@ export class DealService {
                 fromStatus,
                 toStatus,
                 deal: {id: dealId},
-                changedBy: {id: createdById},
+                changedByFullname,
+                changedById,
             });
         } else {
             result = await this.dealHistoryRepository.save({
                 fromStatus,
                 toStatus,
-                deal: {id: dealId},
-                changedBy: {id: createdById},
+                changedByFullname,
+                changedById,
             });
         }
 

@@ -12,8 +12,6 @@ import {
 
 import {DealDto} from '~/modules/deal/dto/deal.dto';
 import {Deal} from '~/modules/deal/entities/deal.entity';
-import {UserDto} from '~/modules/user/dto/user.dto';
-import {User} from '~/modules/user/entities/user.entity';
 
 @Entity('sla_logs')
 export class SlaLog {
@@ -24,6 +22,14 @@ export class SlaLog {
     @ApiProperty({type: 'number'})
     @Column({type: 'int'})
     minutesOverdue: number;
+
+    @ApiProperty({type: 'string', nullable: true})
+    @Column({name: 'manager_id', type: 'uuid', nullable: true})
+    managerId: string | null;
+
+    @ApiProperty({type: 'string', nullable: true})
+    @Column({name: 'manager_fullname', type: 'varchar', nullable: true})
+    managerFullname: string | null;
 
     @ApiProperty()
     @Exclude()
@@ -39,9 +45,4 @@ export class SlaLog {
     @ManyToOne(() => Deal, {onDelete: 'CASCADE'})
     @JoinColumn({name: 'deal_id'})
     deal: Deal;
-
-    @ApiProperty({type: UserDto, nullable: true})
-    @ManyToOne(() => User, {nullable: true, onDelete: 'SET NULL'})
-    @JoinColumn({name: 'manager_id'})
-    manager: User | null;
 }

@@ -1,16 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {Exclude} from 'class-transformer';
-import {
-    Column,
-    CreateDateColumn,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
-
-import {User} from '~/modules/user/entities/user.entity';
+import {Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 
 import {DEAL_STATUS_ENUM} from '../consts';
 import type {DealStatus} from '../types';
@@ -30,21 +19,20 @@ export class DealHistory {
     @Column({name: 'to_status', enum: DEAL_STATUS_ENUM})
     toStatus: DealStatus;
 
+    @ApiProperty({type: 'string', nullable: true})
+    @Column({name: 'changed_by_id', type: 'uuid', nullable: true})
+    changedById: string | null;
+
+    @ApiProperty({type: 'string', nullable: true})
+    @Column({name: 'changed_by_fullname', type: 'varchar', nullable: true})
+    changedByFullname: string | null;
+
     @ApiProperty()
     @CreateDateColumn({name: 'created_at'})
     createdAt: Date;
-
-    @Exclude()
-    @UpdateDateColumn({name: 'updated_at'})
-    updatedAt: Date;
 
     @ApiProperty()
     @ManyToOne(() => Deal, {onDelete: 'CASCADE'})
     @JoinColumn({name: 'deal_id'})
     deal: Deal;
-
-    @ApiProperty({nullable: true})
-    @ManyToOne(() => User, {nullable: true, onDelete: 'SET NULL'})
-    @JoinColumn({name: 'manager_id'})
-    changedBy: User | null;
 }

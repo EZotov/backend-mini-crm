@@ -37,7 +37,7 @@ export class ActivityController {
 
     @ApiOperation({summary: 'Получить список задач по сделке с группировкой по статусу'})
     @ApiOkModifyResponse(GroupedActivityByStatusDto, {isArray: true})
-    @Get('/byStatus')
+    @Get('/by-status')
     async getAllByDealInStatus(@Query('dealId', ParseUUIDModifyPipe) dealId: string) {
         const {activities, total} = await this.activityService.getAllByDeal(dealId, true);
 

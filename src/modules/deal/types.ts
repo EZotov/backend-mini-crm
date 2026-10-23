@@ -1,1 +1,2 @@
-export type DealStatus = 'NEW' | 'IN_PROGRESS' | 'INVOICE' | 'WON' | 'LOST';
+export type DealStatus = 'NEW' | 'REOPEN' | 'IN_PROGRESS' | 'CLOSE';
+export type FunnelStageType = 'WON' | 'LOST' | 'IN_PROGRESS';

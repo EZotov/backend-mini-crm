@@ -12,6 +12,7 @@ import {AuthModule} from './auth/auth.module';
 import {CompanyModule} from './company/company.module';
 import {CustomerModule} from './customer/customer.module';
 import {DealModule} from './deal/deal.module';
+import {FunnelModule} from './funnel/funnel.module';
 import {NotificationModule} from './notification/notification.module';
 import {UserModule} from './user/user.module';
 
@@ -41,6 +42,7 @@ import {UserModule} from './user/user.module';
         ActivityModule,
         AnalyticsModule,
         DealModule,
+        FunnelModule,
         NotificationModule,
     ],
     providers: [],

@@ -124,3 +124,21 @@ export const updateByIdWithRelations = async <T extends ObjectLiteral>(
 };
 
 export const combineUserSessionKey = (userId: string) => `user:session:id:${userId}`;
+
+export const getFullName = ({
+    firstName,
+    lastName,
+    patronymic,
+}: {
+    firstName?: string | null;
+    lastName?: string | null;
+    patronymic?: string | null;
+}) => {
+    const result = [lastName, firstName, patronymic].filter(Boolean).map((part) => part?.trim());
+
+    if (!result.length) {
+        return 'Unknown';
+    }
+
+    return result.join(' ');
+};

@@ -97,7 +97,11 @@ export class CreateDealHistoryLogDto {
 
     @ApiProperty()
     @IsUUID('4')
-    createdById: string;
+    changedById: string;
+
+    @ApiProperty()
+    @IsString()
+    changedByFullname: string;
 
     @ApiProperty()
     @IsString()
