@@ -99,8 +99,6 @@ export class DealController {
         @Query('pageNum', ParseIntPipe) pageNum: number,
         @Query('pageSize', ParseIntPipe) pageSize: number,
     ): Promise<CollectionResponseDto<DealHistoryDto>> {
-        console.log(id);
-
         const {logs, total} = await this.dealService.getDealHistoryList(pageNum, pageSize);
 
         return new CollectionResponseDto({

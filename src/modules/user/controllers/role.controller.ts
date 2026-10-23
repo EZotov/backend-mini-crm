@@ -7,9 +7,9 @@ import {AuthProtected} from '@decorators/auth.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
-import {CreateRoleDto} from './dto/role.dto';
-import {Role} from './entities/role.entity';
-import {UserService} from './user.service';
+import {CreateRoleDto} from '../dto/role.dto';
+import {Role} from '../entities/role.entity';
+import {UserService} from '../user.service';
 
 @ApiTags('Роли')
 @AuthProtected(ROLES.ADMIN)

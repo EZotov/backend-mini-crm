@@ -1,8 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Expose, Type} from 'class-transformer';
 
-import {UserDto} from '~/modules/user/dto/user.dto';
-
 import {DEAL_STATUS_ENUM} from '../consts';
 import type {DealStatus} from '../types';
 import {DealDto} from './deal.dto';
@@ -20,6 +18,14 @@ export class DealHistoryDto {
     @Expose()
     toStatus: DealStatus;
 
+    @ApiProperty({type: 'string', nullable: true})
+    @Expose()
+    changedById: string | null;
+
+    @ApiProperty({type: 'string', nullable: true})
+    @Expose()
+    changedByFullname: string | null;
+
     @ApiProperty()
     @Expose()
     createdAt: Date;
@@ -28,9 +34,4 @@ export class DealHistoryDto {
     @Expose()
     @Type(() => DealDto)
     deal: DealDto;
-
-    @ApiProperty({type: UserDto, nullable: true})
-    @Expose()
-    @Type(() => UserDto)
-    changedBy: UserDto | null;
 }
