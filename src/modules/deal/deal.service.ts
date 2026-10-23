@@ -19,7 +19,6 @@ export class DealService {
     constructor(
         @InjectRepository(Deal) private readonly dealRepository: Repository<Deal>,
         @InjectRepository(DealHistory) private readonly dealHistoryRepository: Repository<DealHistory>,
-        @InjectRepository(SlaLog) private readonly dealSLALogRepository: Repository<SlaLog>,
         private readonly userService: UserService,
     ) {}
 
