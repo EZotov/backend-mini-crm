@@ -1,53 +1,68 @@
-import {Body, Controller, Delete, Get, Patch, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 
-import {ResponseDto} from '@dto/api.dto';
+import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
+import {AuthProtected} from '@decorators/auth.decorator';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
+import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
+
+import {CreateFunnelDto, UpdateFunnelDto} from '../dto/funnel.dto';
+import {Funnel} from '../entities/funnel.entity';
+import {FunnelService} from '../services/funnel.service';
 
 @ApiTags('Воронки')
+@AuthProtected()
 @Controller('funnels')
 export class FunnelController {
+    constructor(private readonly funnelService: FunnelService) {}
+
+    @ApiOkModifyResponse(Funnel, {isArray: true})
     @Get()
-    findAll() {
-        // TODO: Получить список всех воронок (возможно с пагинацией)
-        // return this.funnelService.findAll();
-        return new ResponseDto({
-            data: 'Not implemented',
+    async findAll(): Promise<CollectionResponseDto<Funnel>> {
+        const {funnels, total} = await this.funnelService.getList();
+
+        return new CollectionResponseDto({
+            data: funnels,
+            total,
         });
     }
 
+    @ApiOkModifyResponse(Funnel)
     @Get(':id')
-    findOne() {
-        // TODO: Получить одну воронку по ID
-        // return this.funnelService.findOne(id);
+    async findOne(@Param('id', ParseUUIDModifyPipe) id: string) {
+        const funnel = await this.funnelService.getById(id);
+
         return new ResponseDto({
-            data: 'Not implemented',
+            data: funnel,
         });
     }
 
+    @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    create() {
-        // TODO: Реализовать создание воронки
-        // return this.funnelService.create(createFunnelDto);
+    async create(@Body() dto: CreateFunnelDto): Promise<ResponseDto<CreateResponseDto>> {
+        const createdFunnelId = await this.funnelService.create(dto);
+
         return new ResponseDto({
-            data: 'Not implemented',
+            data: new CreateResponseDto({
+                id: createdFunnelId,
+            }),
         });
     }
 
-    @Patch(':id')
-    update() {
-        // TODO: Обновить метаданные воронки (например, название)
-        // return this.funnelService.update(id, updateFunnelDto);
+    @ApiOkModifyResponse(CreateResponseDto)
+    @Put(':id')
+    async update(@Param('id', ParseUUIDModifyPipe) id: string, @Body() dto: UpdateFunnelDto) {
+        const updatedFunnelId = await this.funnelService.updateById(id, dto);
+
         return new ResponseDto({
-            data: 'Not implemented',
+            data: new CreateResponseDto({
+                id: updatedFunnelId,
+            }),
         });
     }
 
     @Delete(':id')
-    remove() {
-        // TODO: Удалить воронку
-        // return this.funnelService.remove(id);
-        return new ResponseDto({
-            data: 'Not implemented',
-        });
+    remove(@Param('id', ParseUUIDModifyPipe) id: string): Promise<void> {
+        return this.funnelService.removeById(id);
     }
 }

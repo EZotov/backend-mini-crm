@@ -2,4 +2,4 @@ import {OmitType} from '@nestjs/swagger';
 
 import {Role} from '../entities/role.entity';
 
-export class CreateRoleDto extends OmitType(Role, ['id']) {}
+export class CreateOrUpdateRoleDto extends OmitType(Role, ['id']) {}

@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
@@ -11,7 +11,7 @@ import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {UserListFiltersDto} from '../dto/filters.dto';
 import {UpdatePasswordDto, UpdateUserDto, UserDto} from '../dto/user.dto';
-import {UserService} from '../user.service';
+import {UserService} from '../services/user.service';
 
 @ApiTags('Пользователи')
 @AuthProtected(ROLES.ADMIN)
@@ -89,9 +89,9 @@ export class MeUserController {
     @Put()
     async updateMyProfile(
         @UserTokenData('id', ParseUUIDModifyPipe) userId: string,
-        updateDto: UpdateUserDto,
+        @Body() dto: UpdateUserDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
-        await this.userService.updateUserProfile(userId, updateDto);
+        await this.userService.updateUserProfile(userId, dto);
 
         return new ResponseDto({
             data: new CreateResponseDto({id: userId}),
@@ -100,7 +100,7 @@ export class MeUserController {
 
     @ApiOperation({summary: 'Изменить пароль своего профиля'})
     @ApiOkModifyResponse(CreateResponseDto)
-    @Put()
+    @Post()
     async updateMyProfilePassword(
         @UserTokenData('id', ParseUUIDModifyPipe) userId: string,
         @Body() updateDto: UpdatePasswordDto,

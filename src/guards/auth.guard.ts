@@ -8,7 +8,7 @@ import {authError, JWT_ERRORS} from '@consts/errors';
 import {ACCESS_TOKEN_KEY} from '@consts/index';
 import {JwtPayload} from '@interfaces/auth.interface';
 import {AuthService} from '~/modules/auth/auth.service';
-import {UserService} from '~/modules/user/user.service';
+import {UserService} from '~/modules/user/services/user.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {

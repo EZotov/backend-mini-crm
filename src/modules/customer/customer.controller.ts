@@ -8,7 +8,7 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dt
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {CustomerService} from './customer.service';
-import {CreateOrUpdateCustomerDto, CustomerDto} from './dto/customer.dto';
+import {CreateCustomerDto, CustomerDto, UpdateCustomerDto} from './dto/customer.dto';
 
 @ApiTags('Заказчики')
 @AuthProtected()
@@ -45,7 +45,7 @@ export class CustomerController {
     @ApiOperation({summary: 'Создать нового заказчика'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    async create(@Body() createDto: CreateOrUpdateCustomerDto): Promise<ResponseDto<CreateResponseDto>> {
+    async create(@Body() createDto: CreateCustomerDto): Promise<ResponseDto<CreateResponseDto>> {
         const id = await this.customerService.create(createDto);
 
         return new ResponseDto<CreateResponseDto>({
@@ -58,7 +58,7 @@ export class CustomerController {
     @Put(':id')
     async update(
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @Body() updateDto: CreateOrUpdateCustomerDto,
+        @Body() updateDto: UpdateCustomerDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         await this.customerService.updateById(id, updateDto);
 

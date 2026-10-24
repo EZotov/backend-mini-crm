@@ -6,7 +6,7 @@ import {DEFAULT_ORDER} from '~/consts';
 import {getOffsetAndCheckPaginationParams} from '~/utils/helpers';
 import {updateByIdWithRelations} from '~/utils/helpers';
 
-import {CreateOrUpdateCustomerDto} from './dto/customer.dto';
+import {CreateCustomerDto, UpdateCustomerDto} from './dto/customer.dto';
 import {Customer} from './entities/customer.entity';
 
 @Injectable()
@@ -46,7 +46,7 @@ export class CustomerService {
         return customer;
     }
 
-    async create(dto: CreateOrUpdateCustomerDto): Promise<string> {
+    async create(dto: CreateCustomerDto): Promise<string> {
         const {companyId, ...restDto} = dto;
 
         const result = await this.customerRepository.save({...restDto, company: {id: companyId}});
@@ -54,7 +54,7 @@ export class CustomerService {
         return result.id;
     }
 
-    async updateById(id: string, dto: CreateOrUpdateCustomerDto): Promise<string> {
+    async updateById(id: string, dto: UpdateCustomerDto): Promise<string> {
         const {companyId, patronymic = null, ...restDto} = dto;
 
         const result = await updateByIdWithRelations(

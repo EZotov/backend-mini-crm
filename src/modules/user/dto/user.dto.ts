@@ -44,10 +44,10 @@ export class UpdateUserDto {
     @IsString()
     firstName: string;
 
-    @ApiProperty({required: false, nullable: true})
+    @ApiProperty({type: 'string', nullable: true})
     @IsString()
     @IsOptional()
-    patronymic?: string | null;
+    patronymic: string | null;
 
     @ApiProperty()
     @IsString()
@@ -101,6 +101,10 @@ export class UserDto {
     @ApiProperty()
     @Expose()
     lastName: string;
+
+    @ApiProperty({type: 'boolean'})
+    @Expose()
+    isBlocked: boolean;
 
     @ApiProperty({type: 'string', required: false, nullable: true})
     @Expose()

@@ -7,12 +7,11 @@ import {loginError} from '@consts/errors';
 import {DEFAULT_ORDER, ROLES} from '~/consts';
 import {getHashedPassword, getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
 
-import {LoginRequestDto} from '../auth/dto/auth.dto';
-import {UserListFiltersDto} from './dto/filters.dto';
-import {CreateRoleDto} from './dto/role.dto';
-import {CreateUserDto, UpdatePasswordDto, UpdateUserDto} from './dto/user.dto';
-import {Role} from './entities/role.entity';
-import {User} from './entities/user.entity';
+import {LoginRequestDto} from '../../auth/dto/auth.dto';
+import {UserListFiltersDto} from '../dto/filters.dto';
+import {CreateUserDto, UpdatePasswordDto, UpdateUserDto} from '../dto/user.dto';
+import {Role} from '../entities/role.entity';
+import {User} from '../entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -20,7 +19,6 @@ export class UserService {
         @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
         @InjectRepository(User) private readonly userRepository: Repository<User>,
     ) {}
-    // User
     async getUsersList(pageNum: number, pageSize: number, filters?: UserListFiltersDto) {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
 
@@ -120,40 +118,6 @@ export class UserService {
 
         if (!result.affected) {
             throw new NotFoundException('Пользователь уже удалён');
-        }
-    }
-
-    // Roles
-    async getRolesList() {
-        const [list, total] = await this.roleRepository.findAndCount({order: DEFAULT_ORDER});
-
-        return {
-            list,
-            total,
-        };
-    }
-
-    async createRole(createDto: CreateRoleDto): Promise<string> {
-        const result = await this.roleRepository.save(createDto);
-
-        return result.id;
-    }
-
-    async updateRoleById(id: string, updateDto: CreateRoleDto): Promise<string> {
-        const result = await this.roleRepository.update(id, updateDto);
-
-        if (!result.affected) {
-            throw new NotFoundException('Роль не найдена');
-        }
-
-        return id;
-    }
-
-    async removeRoleById(id: string): Promise<void> {
-        const result = await this.roleRepository.delete({id});
-
-        if (!result.affected) {
-            throw new NotFoundException('Роль не была найдена для удаления');
         }
     }
 }

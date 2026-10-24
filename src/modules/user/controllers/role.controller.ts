@@ -7,21 +7,21 @@ import {AuthProtected} from '@decorators/auth.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
-import {CreateRoleDto} from '../dto/role.dto';
+import {CreateOrUpdateRoleDto} from '../dto/role.dto';
 import {Role} from '../entities/role.entity';
-import {UserService} from '../user.service';
+import {RoleService} from '../services/role.service';
 
 @ApiTags('Роли')
 @AuthProtected(ROLES.ADMIN)
 @Controller('roles')
 export class RoleController {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly roleService: RoleService) {}
 
     @ApiOperation({summary: 'Получить список ролей'})
     @ApiOkModifyResponse(Role, {isArray: true})
     @Get()
     async getAll(): Promise<CollectionResponseDto<Role>> {
-        const {list, total} = await this.userService.getRolesList();
+        const {list, total} = await this.roleService.getList();
 
         return new CollectionResponseDto({
             data: list,
@@ -32,8 +32,8 @@ export class RoleController {
     @ApiOperation({summary: 'Создать роль'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    async create(@Body() createDto: CreateRoleDto): Promise<ResponseDto<CreateResponseDto>> {
-        const createdId = await this.userService.createRole(createDto);
+    async create(@Body() createDto: CreateOrUpdateRoleDto): Promise<ResponseDto<CreateResponseDto>> {
+        const createdId = await this.roleService.create(createDto);
 
         return new ResponseDto({
             data: new CreateResponseDto({id: createdId}),
@@ -45,9 +45,9 @@ export class RoleController {
     @Put(':id')
     async update(
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @Body() updateDto: CreateRoleDto,
+        @Body() updateDto: CreateOrUpdateRoleDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
-        await this.userService.updateRoleById(id, updateDto);
+        await this.roleService.updateById(id, updateDto);
 
         return new ResponseDto({
             data: new CreateResponseDto({id}),
@@ -57,6 +57,6 @@ export class RoleController {
     @ApiOperation({summary: 'Удалить роль'})
     @Delete(':id')
     delete(@Param('id', ParseUUIDModifyPipe) id: string): Promise<void> {
-        return this.userService.removeRoleById(id);
+        return this.roleService.removeById(id);
     }
 }

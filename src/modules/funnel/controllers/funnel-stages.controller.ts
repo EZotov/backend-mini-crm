@@ -1,9 +1,11 @@
 import {Body, Controller, Delete, Get, Patch, Post, Put} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 
+import {AuthProtected} from '@decorators/auth.decorator';
 import {ResponseDto} from '@dto/api.dto';
 
 @ApiTags('Этапы воронки')
+@AuthProtected()
 @Controller('/funnels/:id/funnels-stages')
 export class FunnelStagesController {
     @Get()

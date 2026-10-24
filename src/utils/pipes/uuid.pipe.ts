@@ -1,14 +1,8 @@
-import {BadRequestException, HttpStatus, ParseUUIDPipe} from '@nestjs/common';
+import {BadRequestException, ParseUUIDPipe} from '@nestjs/common';
 
 const uuidPipeOptions = {
     version: '4' as const,
-    exceptionFactory: () => {
-        return new BadRequestException({
-            statusCode: HttpStatus.BAD_REQUEST,
-            error: 'Bad Request',
-            message: 'Переданный параметр должен быть валидным UUID v4',
-        });
-    },
+    exceptionFactory: () => new BadRequestException('Переданный параметр должен быть валидным UUID v4'),
 };
 
 /*

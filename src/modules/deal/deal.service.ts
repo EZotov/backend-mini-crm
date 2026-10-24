@@ -5,7 +5,7 @@ import {EntityManager, Repository} from 'typeorm';
 import {DEFAULT_ORDER} from '@consts/index';
 import {getFullName, getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
 
-import {UserService} from '../user/user.service';
+import {UserService} from '../user/services/user.service';
 import {DEAL_AVAILABLE_STATUS, DEAL_STATUS} from './consts';
 import {CreateDealHistoryLogDto, CreateOrUpdateDealDto} from './dto/deal.dto';
 import {DealListFiltersDto} from './dto/filters.dto';

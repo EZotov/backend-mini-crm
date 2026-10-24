@@ -7,4 +7,14 @@ import {FunnelStages} from '../entities/funnel-stages.entity';
 @Injectable()
 export class FunnelStagesService {
     constructor(@InjectRepository(FunnelStages) private readonly funnelStagesRepository: Repository<FunnelStages>) {}
+
+    getList() {}
+
+    getById() {}
+
+    create() {}
+
+    updateById() {}
+
+    removeById() {}
 }

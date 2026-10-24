@@ -15,7 +15,7 @@ import {ENV_KEYS_CONFIG} from '~/configs/env';
 import {combineUserSessionKey} from '~/utils/helpers';
 
 import {CreateUserDto} from '../user/dto/user.dto';
-import {UserService} from '../user/user.service';
+import {UserService} from '../user/services/user.service';
 import {LoginDto, LoginRequestDto} from './dto/auth.dto';
 import {SessionData} from './types';
 

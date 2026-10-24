@@ -36,7 +36,6 @@ async function bootstrap() {
         new ValidationPipe({
             whitelist: true,
             forbidNonWhitelisted: true,
-            transform: true,
             stopAtFirstError: true,
             exceptionFactory: (errors) => {
                 const message = errors?.[0]?.constraints

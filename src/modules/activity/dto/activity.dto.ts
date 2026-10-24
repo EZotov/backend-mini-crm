@@ -1,6 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Expose, Type} from 'class-transformer';
-import {IsOptional, IsString, IsUUID} from 'class-validator';
+import {IsString, IsUUID} from 'class-validator';
 
 import {DealShortDto} from '~/modules/deal/dto/deal.dto';
 import {UserDto} from '~/modules/user/dto/user.dto';
@@ -20,19 +20,17 @@ export class CreateOrUpdateActivityDto {
     @ApiProperty()
     dueDate: Date;
 
-    @ApiProperty({type: 'string', enum: ACTIVITY_STATUS_ENUM, required: false})
-    @IsOptional()
+    @ApiProperty({type: 'string', enum: ACTIVITY_STATUS_ENUM})
     @IsString()
-    status?: ActivityStatus;
+    status: ActivityStatus;
 
     @ApiProperty()
     @IsUUID()
     dealId: string;
 
-    @ApiProperty({type: UserDto, required: false, nullable: true})
-    @IsOptional()
+    @ApiProperty()
     @IsUUID()
-    assignedId?: string | null;
+    assignedId: string;
 }
 
 export class ActivityDto {
