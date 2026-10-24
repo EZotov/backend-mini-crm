@@ -1,5 +1,5 @@
 import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiTags} from '@nestjs/swagger';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {AuthProtected} from '@decorators/auth.decorator';
@@ -16,6 +16,7 @@ import {FunnelService} from '../services/funnel.service';
 export class FunnelController {
     constructor(private readonly funnelService: FunnelService) {}
 
+    @ApiOperation({summary: 'Получить все воронки'})
     @ApiOkModifyResponse(Funnel, {isArray: true})
     @Get()
     async findAll(): Promise<CollectionResponseDto<Funnel>> {
@@ -27,6 +28,7 @@ export class FunnelController {
         });
     }
 
+    @ApiOperation({summary: 'Получить воронку по id'})
     @ApiOkModifyResponse(Funnel)
     @Get(':id')
     async findOne(@Param('id', ParseUUIDModifyPipe) id: string) {
@@ -37,6 +39,7 @@ export class FunnelController {
         });
     }
 
+    @ApiOperation({summary: 'Создать воронку'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Post()
     async create(@Body() dto: CreateFunnelDto): Promise<ResponseDto<CreateResponseDto>> {
@@ -49,6 +52,7 @@ export class FunnelController {
         });
     }
 
+    @ApiOperation({summary: 'Редактировать сведения о воронке'})
     @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
     async update(@Param('id', ParseUUIDModifyPipe) id: string, @Body() dto: UpdateFunnelDto) {
@@ -61,6 +65,7 @@ export class FunnelController {
         });
     }
 
+    @ApiOperation({summary: 'Удалить воронку'})
     @Delete(':id')
     remove(@Param('id', ParseUUIDModifyPipe) id: string): Promise<void> {
         return this.funnelService.removeById(id);
