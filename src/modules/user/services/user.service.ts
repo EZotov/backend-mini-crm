@@ -10,14 +10,14 @@ import {getHashedPassword, getOffsetAndCheckPaginationParams, updateByIdWithRela
 import {LoginRequestDto} from '../../auth/dto/auth.dto';
 import {UserListFiltersDto} from '../dto/filters.dto';
 import {CreateUserDto, UpdatePasswordDto, UpdateUserDto} from '../dto/user.dto';
-import {Role} from '../entities/role.entity';
 import {User} from '../entities/user.entity';
+import {RoleService} from './role.service';
 
 @Injectable()
 export class UserService {
     constructor(
-        @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
         @InjectRepository(User) private readonly userRepository: Repository<User>,
+        private readonly roleService: RoleService,
     ) {}
     async getUsersList(pageNum: number, pageSize: number, filters?: UserListFiltersDto) {
         const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
@@ -67,16 +67,14 @@ export class UserService {
     async createUser(createDto: CreateUserDto): Promise<string> {
         const {password, confirmPassword, ...dto} = createDto;
 
-        const userRole = await this.roleRepository.findOneBy({
-            title: ROLES.USER,
-        });
+        const userRole = await this.roleService.getByTitle(ROLES.USER);
 
         const hashedPassword = await getHashedPassword(password, confirmPassword);
 
         const createdUser = await this.userRepository.save({
             ...dto,
             password: hashedPassword,
-            role: {id: userRole?.id},
+            role: {id: userRole.id},
         });
 
         return createdUser.id;

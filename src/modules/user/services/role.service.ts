@@ -11,7 +11,6 @@ import {Role} from '../entities/role.entity';
 export class RoleService {
     constructor(@InjectRepository(Role) private readonly roleRepository: Repository<Role>) {}
 
-    // Roles
     async getList() {
         const [list, total] = await this.roleRepository.findAndCount({order: DEFAULT_ORDER});
 
@@ -19,6 +18,20 @@ export class RoleService {
             list,
             total,
         };
+    }
+
+    async getByTitle(title: string): Promise<Role> {
+        const role = await this.roleRepository.findOne({
+            where: {
+                title,
+            },
+        });
+
+        if (!role) {
+            throw new NotFoundException('Роль с таким названием не найдена');
+        }
+
+        return role;
     }
 
     async create(createDto: CreateOrUpdateRoleDto): Promise<string> {

@@ -1,5 +1,5 @@
 import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
-import {ApiOperation, ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiQuery, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
@@ -10,7 +10,7 @@ import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {ActivityService} from './activity.service';
 import {ActivityDto, CreateOrUpdateActivityDto, GroupedActivityByStatusDto} from './dto/activity.dto';
-import {ActivityListFiltersDto} from './dto/filters.dto';
+import {ActivityListByStatusFiltersDto, ActivityListFiltersDto} from './dto/filters.dto';
 import {Activity} from './entities/activity.entity';
 import {GroupedActivityEntities} from './types';
 
@@ -20,26 +20,24 @@ import {GroupedActivityEntities} from './types';
 export class ActivityController {
     constructor(private readonly activityService: ActivityService) {}
 
-    @ApiOperation({summary: 'Получить список задач по сделке'})
+    @ApiOperation({summary: 'Получить список задач'})
     @ApiOkModifyResponse(ActivityDto, {isArray: true})
     @Get()
-    async getAllByDeal(
-        @Query('dealId', ParseUUIDModifyPipe) dealId: string,
-        @Query() filterDto?: ActivityListFiltersDto,
-    ) {
-        const {activities, total} = await this.activityService.getAllByDeal(dealId, false, filterDto);
+    async getAllByDeal(@Query() filterDto?: ActivityListFiltersDto) {
+        const {activities, total} = await this.activityService.getList(false, filterDto);
 
         return new CollectionResponseDto({
-            data: plainToInstance(ActivityDto, activities as Activity[]),
+            data: plainToInstance(ActivityDto, activities as Activity[], {excludeExtraneousValues: true}),
             total,
         });
     }
 
-    @ApiOperation({summary: 'Получить список задач по сделке с группировкой по статусу'})
+    @ApiOperation({summary: 'Получить список задач с группировкой по статусу'})
     @ApiOkModifyResponse(GroupedActivityByStatusDto, {isArray: true})
+    @ApiQuery({name: 'dealId', required: false})
     @Get('/by-status')
-    async getAllByDealInStatus(@Query('dealId', ParseUUIDModifyPipe) dealId: string) {
-        const {activities, total} = await this.activityService.getAllByDeal(dealId, true);
+    async getAllByDealInStatus(filters?: ActivityListByStatusFiltersDto) {
+        const {activities, total} = await this.activityService.getList(true, filters);
 
         return new CollectionResponseDto({
             data: plainToInstance(GroupedActivityByStatusDto, activities as GroupedActivityEntities[], {
@@ -67,10 +65,11 @@ export class ActivityController {
     @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
     async update(
+        @UserTokenData('id') userId: string,
         @Param('id', ParseUUIDModifyPipe) id: string,
         @Body() dto: CreateOrUpdateActivityDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
-        const updatedId = await this.activityService.updateById(id, dto);
+        const updatedId = await this.activityService.updateById(userId, id, dto);
 
         return new ResponseDto<CreateResponseDto>({
             data: new CreateResponseDto({id: updatedId}),

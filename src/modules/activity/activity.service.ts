@@ -19,10 +19,10 @@ export class ActivityService {
         private readonly userService: UserService,
     ) {}
 
-    async getAllByDeal(dealId: string, groupeInStatus = false, filters?: ActivityListFiltersDto) {
+    async getList(groupeInStatus = false, filters?: ActivityListFiltersDto) {
         const [activities, total] = await this.activityRepository.findAndCount({
             where: {
-                deal: {id: dealId},
+                deal: {id: filters?.dealId},
                 createdBy: {id: filters?.createdById},
                 assigned: {id: filters?.assignedId},
                 status: filters?.status,
