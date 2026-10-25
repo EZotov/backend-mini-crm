@@ -26,7 +26,7 @@ export class FunnelService {
         const funnel = await this.funnelRepository.findOne({where: {id}});
 
         if (!funnel) {
-            throw new NotFoundException(`Воронка по ${id} не найдена`);
+            throw new NotFoundException(`Воронка с ID ${id} не найдена`);
         }
 
         return funnel;
@@ -42,7 +42,7 @@ export class FunnelService {
         const result = await this.funnelRepository.update(id, dto);
 
         if (!result.affected) {
-            throw new NotFoundException(`Не удалось обновить воронку по ${id}`);
+            throw new NotFoundException(`Не удалось обновить данные воронки с ID ${id} или она не была найдена`);
         }
 
         return id;
@@ -52,7 +52,7 @@ export class FunnelService {
         const result = await this.funnelRepository.delete(id);
 
         if (!result.affected) {
-            throw new NotFoundException('Не удалось удалить воронку');
+            throw new NotFoundException(`Не удалось удалить воронку с ID ${id} или она не была найдена`);
         }
     }
 }

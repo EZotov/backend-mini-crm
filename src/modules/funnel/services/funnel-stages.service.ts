@@ -45,7 +45,7 @@ export class FunnelStagesService {
         });
 
         if (!stage) {
-            throw new NotFoundException(`Этап воронки не найден`);
+            throw new NotFoundException(`Этап воронки с ID ${stageId} не найден`);
         }
 
         return stage;
@@ -87,7 +87,9 @@ export class FunnelStagesService {
         });
 
         if (!result.affected) {
-            throw new NotFoundException('Не удалось обновить этап воронки');
+            throw new NotFoundException(
+                `Не удалось обновить данные этапа воронки с ID ${stageId} или он не был найден`,
+            );
         }
 
         return stageId;
@@ -126,7 +128,9 @@ export class FunnelStagesService {
             });
 
             if (updateResult.affected === 0) {
-                throw new NotFoundException(`Этап воронки с ID ${stageId} не найден`);
+                throw new NotFoundException(
+                    `Не удалось изменить порядок этапа воронки с ID ${stageId} или он не был найден`,
+                );
             }
         });
     }
@@ -141,7 +145,11 @@ export class FunnelStagesService {
 
         await this.dataSource.transaction(async (transactionalEntityManager) => {
             // Удаляем саму стадию
-            await transactionalEntityManager.delete(FunnelStage, stageId);
+            const result = await transactionalEntityManager.delete(FunnelStage, stageId);
+
+            if (!result.affected) {
+                throw new NotFoundException(`Не удалось удалить этап воронки с ID ${stageId} или он не был найден`);
+            }
 
             // Уменьшаем order на 1 у всех подходящих записей одной командой
             await transactionalEntityManager.decrement(

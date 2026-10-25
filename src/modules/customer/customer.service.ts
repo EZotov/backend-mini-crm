@@ -40,7 +40,7 @@ export class CustomerService {
         });
 
         if (!customer) {
-            throw new NotFoundException('Заказчик не найден');
+            throw new NotFoundException(`Заказчик с ID ${customerId} не найден`);
         }
 
         return customer;
@@ -68,7 +68,7 @@ export class CustomerService {
         );
 
         if (!result.affected) {
-            throw new NotFoundException(`Заказчик с ID ${id} не найден`);
+            throw new NotFoundException(`Не удалось обновить данные заказчика с ID ${id} или он не был найден`);
         }
 
         return id;
@@ -78,7 +78,7 @@ export class CustomerService {
         const result = await this.customerRepository.delete({id: customerId});
 
         if (!result.affected) {
-            throw new NotFoundException('Заказчик не был найден для удаления');
+            throw new NotFoundException(`Не удалось удалить заказчика с ID ${customerId} или он не был найден`);
         }
     }
 }

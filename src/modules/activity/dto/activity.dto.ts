@@ -15,6 +15,10 @@ export class CreateOrUpdateActivityDto {
 
     @ApiProperty()
     @IsString()
+    title: string;
+
+    @ApiProperty()
+    @IsString()
     description: string;
 
     @ApiProperty()
@@ -41,6 +45,10 @@ export class ActivityDto {
     @ApiProperty({enum: ACTIVITY_ENUM})
     @Expose()
     type: ActivityType;
+
+    @ApiProperty()
+    @Expose()
+    title: string;
 
     @ApiProperty()
     @Expose()

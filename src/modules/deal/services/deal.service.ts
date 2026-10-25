@@ -1,24 +1,24 @@
 import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {EntityManager, Repository} from 'typeorm';
+import {Repository} from 'typeorm';
 
 import {DEFAULT_ORDER} from '@consts/index';
 import {getFullName, getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
 
-import {UserService} from '../user/services/user.service';
-import {DEAL_AVAILABLE_STATUS, DEAL_STATUS} from './consts';
-import {CreateDealHistoryLogDto, CreateOrUpdateDealDto} from './dto/deal.dto';
-import {DealListFiltersDto} from './dto/filters.dto';
-import {Deal} from './entities/deal.entity';
-import {DealHistory} from './entities/deal-history.entity';
-import {SlaLog} from './entities/sla.entity';
-import {DealStatus} from './types';
+import {UserService} from '../../user/services/user.service';
+import {DEAL_AVAILABLE_STATUS, DEAL_STATUS} from '../consts';
+import {CreateOrUpdateDealDto} from '../dto/deal.dto';
+import {DealListFiltersDto} from '../dto/filters.dto';
+import {Deal} from '../entities/deal.entity';
+import {SlaLog} from '../entities/sla.entity';
+import {DealStatus} from '../types';
+import {DealHistoryService} from './deal-history.service';
 
 @Injectable()
 export class DealService {
     constructor(
         @InjectRepository(Deal) private readonly dealRepository: Repository<Deal>,
-        @InjectRepository(DealHistory) private readonly dealHistoryRepository: Repository<DealHistory>,
+        private readonly dealHistoryService: DealHistoryService,
         private readonly userService: UserService,
     ) {}
 
@@ -73,7 +73,7 @@ export class DealService {
         });
 
         if (!deal) {
-            throw new NotFoundException(`Сделка по ${id} не найдена`);
+            throw new NotFoundException(`Сделка с ID ${id} не найдена`);
         }
 
         return deal;
@@ -90,22 +90,48 @@ export class DealService {
             slaDeadline: new Date(new Date().getTime() + 30 * 60 * 1000),
         });
 
+        const createdBy = await this.userService.getUserById(userId);
+
+        this.dealHistoryService.createHistoryLog({
+            dealId: result.id,
+            changedById: userId,
+            changedByFullname: getFullName({
+                firstName: createdBy.firstName,
+                lastName: createdBy.lastName,
+                patronymic: createdBy.patronymic,
+            }),
+            actionDescription: `Создана новая сделка "${result.title}"`,
+        });
+
         return result.id;
     }
 
-    async updateById(id: string, dto: CreateOrUpdateDealDto): Promise<string> {
+    async updateById(userId: string, dealId: string, dto: CreateOrUpdateDealDto): Promise<string> {
         const {customerId, managerId, ...flatDto} = dto;
 
-        const result = await updateByIdWithRelations(this.dealRepository, Deal, id, flatDto, {
+        const result = await updateByIdWithRelations(this.dealRepository, Deal, dealId, flatDto, {
             manager: managerId,
             customer: customerId,
         });
 
         if (!result.affected) {
-            throw new NotFoundException(`Сделка по ${id} не найдена для обновления`);
+            throw new NotFoundException(`Не удалось обновить данные сделки с ID ${dealId} или она не была найдена`);
         }
 
-        return id;
+        const updatedBy = await this.userService.getUserById(userId);
+
+        this.dealHistoryService.createHistoryLog({
+            dealId,
+            changedById: userId,
+            changedByFullname: getFullName({
+                firstName: updatedBy.firstName,
+                lastName: updatedBy.lastName,
+                patronymic: updatedBy.patronymic,
+            }),
+            actionDescription: `Обновлены данные по сделке ${dealId} с текущим названием "${dto.title}"`,
+        });
+
+        return dealId;
     }
 
     async updateStatusById(id: string, currentUserid: string, status: DealStatus): Promise<string> {
@@ -121,7 +147,7 @@ export class DealService {
             });
 
             if (!currentDeal) {
-                throw new NotFoundException(`Сделка не найдена`);
+                throw new NotFoundException(`Сделка с ${id} не найдена`);
             }
 
             if (!this.isValidStatusTransition(currentDeal.status, status)) {
@@ -162,7 +188,7 @@ export class DealService {
             await entityManager.update(Deal, id, {status, isSlaViolated});
 
             // Пишем лог в историю
-            await this.createHistoryLog(
+            await this.dealHistoryService.createHistoryLog(
                 {
                     changedById: currentUserid,
                     changedByFullname: getFullName({
@@ -184,47 +210,8 @@ export class DealService {
         const result = await this.dealRepository.delete(id);
 
         if (!result.affected) {
-            throw new NotFoundException(`Сделка по ${id} не найдена для удаления`);
+            throw new NotFoundException(`Не удалось удалить сделку с ID ${id} или она не была найдена`);
         }
-    }
-
-    async getDealHistoryList(pageNum: number, pageSize: number) {
-        const skipCounts = getOffsetAndCheckPaginationParams(pageNum, pageSize);
-
-        const [logs, total] = await this.dealHistoryRepository.findAndCount({
-            take: pageNum,
-            skip: skipCounts,
-            order: DEFAULT_ORDER,
-        });
-
-        return {
-            logs,
-            total,
-        };
-    }
-
-    async createHistoryLog(dto: CreateDealHistoryLogDto, entityManager?: EntityManager): Promise<string> {
-        const {actionDescription, dealId, changedByFullname, changedById} = dto;
-
-        let result: DealHistory;
-
-        // Сделать лог в рамках транзакции извне
-        if (entityManager) {
-            result = await entityManager.save(DealHistory, {
-                actionDescription,
-                deal: {id: dealId},
-                changedByFullname,
-                changedById,
-            });
-        } else {
-            result = await this.dealHistoryRepository.save({
-                actionDescription,
-                changedByFullname,
-                changedById,
-            });
-        }
-
-        return result.id;
     }
 
     isValidStatusTransition(fromStatus: DealStatus, toStatus: DealStatus) {

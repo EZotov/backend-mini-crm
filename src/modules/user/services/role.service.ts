@@ -31,7 +31,7 @@ export class RoleService {
         const result = await this.roleRepository.update(id, updateDto);
 
         if (!result.affected) {
-            throw new NotFoundException('Роль не найдена');
+            throw new NotFoundException(`Не удалось обновить данные роли с ID ${id} или она не была найдена`);
         }
 
         return id;
@@ -41,7 +41,7 @@ export class RoleService {
         const result = await this.roleRepository.delete({id});
 
         if (!result.affected) {
-            throw new NotFoundException('Роль не была найдена для удаления');
+            throw new NotFoundException(`Роль с ID ${id} не была найдена для удаления`);
         }
     }
 }

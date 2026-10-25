@@ -8,17 +8,21 @@ import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
-import {DealService} from './deal.service';
 import {ChangeStatusDealDto, CreateOrUpdateDealDto, DealDto} from './dto/deal.dto';
 import {DealHistoryDto} from './dto/deal-history.dto';
 import {DealListFiltersDto} from './dto/filters.dto';
 import {Deal} from './entities/deal.entity';
+import {DealService} from './services/deal.service';
+import {DealHistoryService} from './services/deal-history.service';
 
 @ApiTags('Сделки')
 @AuthProtected()
 @Controller('deals')
 export class DealController {
-    constructor(private readonly dealService: DealService) {}
+    constructor(
+        private readonly dealService: DealService,
+        private readonly dealHistoryService: DealHistoryService,
+    ) {}
 
     @ApiOperation({summary: 'Получить все сделки'})
     @ApiOkModifyResponse(DealDto, {isArray: true})
@@ -65,10 +69,11 @@ export class DealController {
     @ApiOkModifyResponse(CreateResponseDto)
     @Put(':id')
     async update(
+        @UserTokenData('id') userId: string,
         @Param('id', ParseUUIDModifyPipe) id: string,
         @Body() dto: CreateOrUpdateDealDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
-        await this.dealService.updateById(id, dto);
+        await this.dealService.updateById(userId, id, dto);
 
         return new ResponseDto({
             data: new CreateResponseDto({id}),
@@ -113,7 +118,7 @@ export class DealController {
         @Query('pageNum', ParseIntPipe) pageNum: number,
         @Query('pageSize', ParseIntPipe) pageSize: number,
     ): Promise<CollectionResponseDto<DealHistoryDto>> {
-        const {logs, total} = await this.dealService.getDealHistoryList(pageNum, pageSize);
+        const {logs, total} = await this.dealHistoryService.getDealHistoryList(pageNum, pageSize);
 
         return new CollectionResponseDto({
             data: plainToInstance(DealHistoryDto, logs, {excludeExtraneousValues: true}),

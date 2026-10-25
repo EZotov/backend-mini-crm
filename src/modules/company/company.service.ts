@@ -47,7 +47,7 @@ export class CompanyService {
         const result = await this.companyRepository.update(id, dto);
 
         if (!result.affected) {
-            throw new NotFoundException(`Компания с ID ${id} не найдена для обновления`);
+            throw new NotFoundException(`Не удалось обновить данные компании с ID ${id} или она не была найдена`);
         }
 
         return id;
@@ -57,7 +57,7 @@ export class CompanyService {
         const result = await this.companyRepository.delete(id);
 
         if (!result.affected) {
-            throw new NotFoundException(`Компания с ID ${id} не найдена для удаления`);
+            throw new NotFoundException(`Не удалось удалить компанию с ID ${id} или она не была найдена`);
         }
     }
 }

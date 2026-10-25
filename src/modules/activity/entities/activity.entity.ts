@@ -30,6 +30,10 @@ export class Activity {
     type: ActivityType;
 
     @ApiProperty()
+    @Column({type: 'varchar'})
+    title: string;
+
+    @ApiProperty()
     @Column()
     description: string;
 

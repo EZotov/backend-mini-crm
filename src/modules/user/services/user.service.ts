@@ -44,7 +44,7 @@ export class UserService {
         const user = await this.userRepository.findOne({where: {id}, relations: {role: true}});
 
         if (!user) {
-            throw new NotFoundException('Пользователь не найден');
+            throw new NotFoundException(`Пользователь с ID ${id} не найден`);
         }
 
         return user;
@@ -95,7 +95,7 @@ export class UserService {
         const result = await this.userRepository.update(userId, {password: hashedPassword});
 
         if (!result.affected) {
-            throw new NotFoundException('Пользователя не существует');
+            throw new NotFoundException(`Не удалось обновить данные пользователя с ID ${userId} или он не был найден`);
         }
 
         return userId;
@@ -107,7 +107,7 @@ export class UserService {
         const result = await updateByIdWithRelations(this.userRepository, User, userId, restDto, {role: roleId});
 
         if (!result.affected) {
-            throw new NotFoundException('Пользователь не найден');
+            throw new NotFoundException(`Не удалось обновить пользователя с ID ${userId} или он не был найден`);
         }
 
         return userId;
@@ -117,7 +117,7 @@ export class UserService {
         const result = await this.userRepository.softDelete(id);
 
         if (!result.affected) {
-            throw new NotFoundException('Пользователь уже удалён');
+            throw new NotFoundException(`Не удалось удалить пользователя с ID ${id} или он не был найден`);
         }
     }
 }
