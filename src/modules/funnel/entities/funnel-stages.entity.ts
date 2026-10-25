@@ -8,7 +8,7 @@ import {Funnel} from './funnel.entity';
 
 @Entity('funnel_stages')
 @Index('UQ_FUNNEL_STAGE_ORDER', ['funnel', 'order'], {unique: true})
-export class FunnelStages extends BaseEntity {
+export class FunnelStage extends BaseEntity {
     @Column({type: 'varchar'})
     title: string;
 

@@ -1,56 +1,89 @@
-import {Body, Controller, Delete, Get, Patch, Post, Put} from '@nestjs/common';
-import {ApiTags} from '@nestjs/swagger';
+import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
+import {ApiOperation, ApiTags} from '@nestjs/swagger';
+import {plainToInstance} from 'class-transformer';
 
+import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
 import {AuthProtected} from '@decorators/auth.decorator';
-import {ResponseDto} from '@dto/api.dto';
+import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
+import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
+
+import {
+    ChangeOrderFunnelStagesDto,
+    CreateFunnelStagesDto,
+    FunnelStagesDto,
+    UpdateFunnelStagesDto,
+} from '../dto/funnel-stages.dto';
+import {FunnelStagesService} from '../services/funnel-stages.service';
 
 @ApiTags('Этапы воронки')
 @AuthProtected()
-@Controller('/funnels/:id/funnels-stages')
+@Controller('funnel-stages')
 export class FunnelStagesController {
-    @Get()
-    findAll() {
-        // TODO: Получить все этапы для конкретной воронки (отсортированные по order)
-        // return this.funnelService.findStagesByFunnel(funnelId);
-        return new ResponseDto({
-            data: 'Not implemented',
+    constructor(private readonly funnelStageService: FunnelStagesService) {}
+
+    @ApiOperation({summary: 'Получить список этапов по воронке'})
+    @ApiOkModifyResponse(FunnelStagesDto, {isArray: true})
+    @Get('by-funnel/:funnelId')
+    async getList(
+        @Param('funnelId', ParseUUIDModifyPipe) funnelId: string,
+    ): Promise<CollectionResponseDto<FunnelStagesDto>> {
+        const {stages, total} = await this.funnelStageService.getList(funnelId);
+
+        return new CollectionResponseDto({
+            data: plainToInstance(FunnelStagesDto, stages, {excludeExtraneousValues: true}),
+            total,
         });
     }
 
+    @ApiOperation({summary: 'Получить этап воронки по id'})
+    @ApiOkModifyResponse(FunnelStagesDto)
+    @Get(':stageId')
+    async get(@Param('stageId', ParseUUIDModifyPipe) stageId: string): Promise<ResponseDto<FunnelStagesDto>> {
+        const stage = await this.funnelStageService.getById(stageId);
+
+        return new ResponseDto({
+            data: plainToInstance(FunnelStagesDto, stage, {excludeExtraneousValues: true}),
+        });
+    }
+
+    @ApiOperation({summary: 'Создать этап воронки'})
+    @ApiOkModifyResponse(CreateResponseDto)
     @Post()
-    create() {
-        // TODO: Добавить новый этап в конкретную воронку
-        // return this.funnelService.addStage(funnelId, createStageDto);
+    async create(@Body() dto: CreateFunnelStagesDto): Promise<ResponseDto<CreateResponseDto>> {
+        const createdStageId = await this.funnelStageService.create(dto);
+
         return new ResponseDto({
-            data: 'Not implemented',
+            data: new CreateResponseDto({
+                id: createdStageId,
+            }),
         });
     }
 
-    @Put('reorder')
-    reorder() {
-        // PUT используется для полного обновления коллекции/порядка.
-        // TODO: Изменить порядок этапов (drag-and-drop на фронтенде)
-        // return this.funnelService.reorderStages(funnelId, reorderStagesDto);
+    @ApiOperation({summary: 'Редактировать сведения об этапе воронки'})
+    @ApiOkModifyResponse(CreateResponseDto)
+    @Put(':stageId')
+    async update(@Param('stageId', ParseUUIDModifyPipe) stageId: string, @Body() dto: UpdateFunnelStagesDto) {
+        await this.funnelStageService.updateById(stageId, dto);
+
         return new ResponseDto({
-            data: 'Not implemented',
+            data: new CreateResponseDto({
+                id: stageId,
+            }),
         });
     }
 
-    @Patch(':stageId')
-    update() {
-        // TODO: Обновить конкретный этап (название, цвет и т.д.)
-        // return this.funnelService.updateStage(funnelId, stageId, updateStageDto);
-        return new ResponseDto({
-            data: 'Not implemented',
-        });
+    @ApiOperation({summary: 'Изменение порядка этапа воронки'})
+    @Post(':stageId/reorder')
+    reorder(
+        @Param('stageId', ParseUUIDModifyPipe) stageId: string,
+        @Body() dto: ChangeOrderFunnelStagesDto,
+    ): Promise<void> {
+        return this.funnelStageService.changeOrder(stageId, dto);
     }
 
+    @ApiOperation({summary: 'Удалить этап воронки'})
     @Delete(':stageId')
-    remove() {
-        // TODO: Удалить этап из воронки (с валидацией, нет ли там активных сделок)
-        // return this.funnelService.removeStage(funnelId, stageId);
-        return new ResponseDto({
-            data: 'Not implemented',
-        });
+    remove(@Param('stageId', ParseUUIDModifyPipe) stageId: string) {
+        return this.funnelStageService.removeById(stageId);
     }
 }

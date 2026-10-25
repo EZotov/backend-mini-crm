@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 
 import {Customer} from '~/modules/customer/entities/customer.entity';
-import {FunnelStages} from '~/modules/funnel/entities/funnel-stages.entity';
+import {FunnelStage} from '~/modules/funnel/entities/funnel-stages.entity';
 import {User} from '~/modules/user/entities/user.entity';
 
 import {DEAL_STATUS, DEAL_STATUS_ENUM} from '../consts';
@@ -66,8 +66,8 @@ export class Deal {
     @JoinColumn({name: 'customer_id'})
     customer: Customer;
 
-    @ApiProperty({type: () => FunnelStages})
-    @ManyToOne(() => FunnelStages, {onDelete: 'SET NULL'})
+    @ApiProperty({type: () => FunnelStage})
+    @ManyToOne(() => FunnelStage, {onDelete: 'SET NULL'})
     @JoinColumn({name: 'funnel_stage_id'})
-    currentFunnelStage: FunnelStages;
+    currentFunnelStage: FunnelStage;
 }
