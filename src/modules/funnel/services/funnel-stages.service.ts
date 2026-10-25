@@ -51,9 +51,7 @@ export class FunnelStagesService {
         return stage;
     }
 
-    async create(dto: CreateFunnelStagesDto): Promise<string> {
-        const {funnelId, ...flatDto} = dto;
-
+    async create(funnelId: string, dto: CreateFunnelStagesDto): Promise<string> {
         return this.dataSource.transaction(async (transactionalEntityManager) => {
             // Блокируем воронку. Это гарантирует 100% защиту от гонки сессий, даже если воронка пустая.
             await transactionalEntityManager.findOne(Funnel, {
@@ -70,7 +68,7 @@ export class FunnelStagesService {
 
             // Сохраняем новую стадию с вычисленным order
             const createdStage = await transactionalEntityManager.save(FunnelStage, {
-                ...flatDto,
+                ...dto,
                 order: nextOrder,
                 funnel: {id: funnelId},
             });
@@ -95,8 +93,8 @@ export class FunnelStagesService {
         return stageId;
     }
 
-    async changeOrder(stageId: string, dto: ChangeOrderFunnelStagesDto): Promise<void> {
-        const {funnelId, sourceIndex, targetIndex} = dto;
+    async changeOrder(funnelId: string, stageId: string, dto: ChangeOrderFunnelStagesDto): Promise<void> {
+        const {sourceIndex, targetIndex} = dto;
 
         if (sourceIndex === targetIndex) return;
 

@@ -8,10 +8,9 @@ import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dto';
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
-import {ChangeStatusDealDto, CreateOrUpdateDealDto, DealDto} from './dto/deal.dto';
+import {ChangeDealFunnelStage, ChangeStatusDealDto, CreateOrUpdateDealDto, DealDto} from './dto/deal.dto';
 import {DealHistoryDto} from './dto/deal-history.dto';
 import {DealListFiltersDto} from './dto/filters.dto';
-import {Deal} from './entities/deal.entity';
 import {DealService} from './services/deal.service';
 import {DealHistoryService} from './services/deal-history.service';
 
@@ -41,7 +40,7 @@ export class DealController {
     }
 
     @ApiOperation({summary: 'Получить сделку'})
-    @ApiOkModifyResponse(Deal)
+    @ApiOkModifyResponse(DealDto)
     @Get(':id')
     async get(@Param('id', ParseUUIDModifyPipe) id: string): Promise<ResponseDto<DealDto>> {
         const deal = await this.dealService.getById(id);
@@ -82,7 +81,7 @@ export class DealController {
 
     @ApiOperation({summary: 'Изменить статус сделки'})
     @ApiOkModifyResponse(CreateResponseDto)
-    @Patch(':id')
+    @Patch(':id/status')
     async changeStatus(
         @Param('id', ParseUUIDModifyPipe) id: string,
         @UserTokenData('id') currentUserid: string,
@@ -97,14 +96,12 @@ export class DealController {
 
     @ApiOperation({summary: 'Изменить этап воронки сделки'})
     @ApiOkModifyResponse(CreateResponseDto)
-    @Patch(':id')
+    @Patch(':id/funnel-stage')
     changeFunnelStage(
-        @Param('id', ParseUUIDModifyPipe) id: string,
         @UserTokenData('id') currentUserid: string,
-        @Body() dto: ChangeStatusDealDto,
+        @Param('id', ParseUUIDModifyPipe) id: string,
+        @Body() dto: ChangeDealFunnelStage,
     ): ResponseDto<string> {
-        this.dealService.updateStatusById(id, currentUserid, dto.status);
-
         return new ResponseDto({
             data: 'Not implemented',
         });

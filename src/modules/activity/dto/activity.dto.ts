@@ -1,6 +1,6 @@
 import {ApiProperty} from '@nestjs/swagger';
 import {Expose, Type} from 'class-transformer';
-import {IsString, IsUUID} from 'class-validator';
+import {IsOptional, IsString, IsUUID} from 'class-validator';
 
 import {DealShortDto} from '~/modules/deal/dto/deal.dto';
 import {UserDto} from '~/modules/user/dto/user.dto';
@@ -8,7 +8,38 @@ import {UserDto} from '~/modules/user/dto/user.dto';
 import {ACTIVITY_ENUM, ACTIVITY_STATUS_ENUM} from '../consts';
 import type {ActivityStatus, ActivityType} from '../types';
 
-export class CreateOrUpdateActivityDto {
+export class CreateActivityDto {
+    @ApiProperty({enum: ACTIVITY_ENUM})
+    @IsString()
+    type: ActivityType;
+
+    @ApiProperty()
+    @IsString()
+    title: string;
+
+    @ApiProperty()
+    @IsString()
+    description: string;
+
+    @ApiProperty()
+    dueDate: Date;
+
+    @ApiProperty({required: false, type: 'string', enum: ACTIVITY_STATUS_ENUM})
+    @IsString()
+    @IsOptional()
+    status: ActivityStatus;
+
+    @ApiProperty({required: false, type: 'string', nullable: true})
+    @IsUUID()
+    @IsOptional()
+    dealId?: string | null;
+
+    @ApiProperty()
+    @IsUUID()
+    assignedId: string;
+}
+
+export class UpdateActivityDto {
     @ApiProperty({enum: ACTIVITY_ENUM})
     @IsString()
     type: ActivityType;
@@ -28,9 +59,10 @@ export class CreateOrUpdateActivityDto {
     @IsString()
     status: ActivityStatus;
 
-    @ApiProperty()
+    @ApiProperty({type: 'string', nullable: true})
     @IsUUID()
-    dealId: string;
+    @IsOptional()
+    dealId: string | null;
 
     @ApiProperty()
     @IsUUID()
@@ -58,10 +90,10 @@ export class ActivityDto {
     @Expose()
     dueDate: Date;
 
-    @ApiProperty({type: DealShortDto})
+    @ApiProperty({type: DealShortDto, nullable: true})
     @Expose()
     @Type(() => DealShortDto)
-    deal: DealShortDto;
+    deal: DealShortDto | null;
 
     @ApiProperty({type: UserDto, nullable: true})
     @Expose()

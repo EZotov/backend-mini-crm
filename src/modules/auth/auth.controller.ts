@@ -1,6 +1,6 @@
 import {Body, Controller, Post, Req, Res} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {ApiOperation, ApiTags} from '@nestjs/swagger';
+import {ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 import type {Request, Response} from 'express';
 
 import {ApiOkModifyResponse} from '@decorators/api-response-swagger.decorator';
@@ -108,8 +108,8 @@ export class AuthController {
     }
 
     @ApiOperation({summary: 'Выйти из системы'})
-    @ApiOkModifyResponse()
     @AuthProtected()
+    @ApiOkResponse()
     @Post('logout')
     async logout(@UserTokenData('id') userId: string, @Res({passthrough: true}) res: Response): Promise<void> {
         await this.authService.logout(userId);

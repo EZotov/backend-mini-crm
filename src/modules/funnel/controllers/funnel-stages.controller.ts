@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Patch, Post, Put} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
@@ -17,13 +17,13 @@ import {FunnelStagesService} from '../services/funnel-stages.service';
 
 @ApiTags('Этапы воронки')
 @AuthProtected()
-@Controller('funnel-stages')
+@Controller()
 export class FunnelStagesController {
     constructor(private readonly funnelStageService: FunnelStagesService) {}
 
     @ApiOperation({summary: 'Получить список этапов по воронке'})
     @ApiOkModifyResponse(FunnelStagesDto, {isArray: true})
-    @Get('by-funnel/:funnelId')
+    @Get('funnels/:funnelId/stages')
     async getList(
         @Param('funnelId', ParseUUIDModifyPipe) funnelId: string,
     ): Promise<CollectionResponseDto<FunnelStagesDto>> {
@@ -37,7 +37,7 @@ export class FunnelStagesController {
 
     @ApiOperation({summary: 'Получить этап воронки по id'})
     @ApiOkModifyResponse(FunnelStagesDto)
-    @Get(':stageId')
+    @Get('funnel-stages/:stageId')
     async get(@Param('stageId', ParseUUIDModifyPipe) stageId: string): Promise<ResponseDto<FunnelStagesDto>> {
         const stage = await this.funnelStageService.getById(stageId);
 
@@ -48,9 +48,12 @@ export class FunnelStagesController {
 
     @ApiOperation({summary: 'Создать этап воронки'})
     @ApiOkModifyResponse(CreateResponseDto)
-    @Post()
-    async create(@Body() dto: CreateFunnelStagesDto): Promise<ResponseDto<CreateResponseDto>> {
-        const createdStageId = await this.funnelStageService.create(dto);
+    @Post('/funnels/:funnelId/stages')
+    async create(
+        @Param('funnelId', ParseUUIDModifyPipe) funnelId: string,
+        @Body() dto: CreateFunnelStagesDto,
+    ): Promise<ResponseDto<CreateResponseDto>> {
+        const createdStageId = await this.funnelStageService.create(funnelId, dto);
 
         return new ResponseDto({
             data: new CreateResponseDto({
@@ -61,7 +64,7 @@ export class FunnelStagesController {
 
     @ApiOperation({summary: 'Редактировать сведения об этапе воронки'})
     @ApiOkModifyResponse(CreateResponseDto)
-    @Put(':stageId')
+    @Put('funnel-stages/:stageId')
     async update(@Param('stageId', ParseUUIDModifyPipe) stageId: string, @Body() dto: UpdateFunnelStagesDto) {
         await this.funnelStageService.updateById(stageId, dto);
 
@@ -73,16 +76,17 @@ export class FunnelStagesController {
     }
 
     @ApiOperation({summary: 'Изменение порядка этапа воронки'})
-    @Post(':stageId/reorder')
+    @Patch('funnels/:funnelId/stages/:stageId/order')
     reorder(
+        @Param('funnelId', ParseUUIDModifyPipe) funnelId: string,
         @Param('stageId', ParseUUIDModifyPipe) stageId: string,
         @Body() dto: ChangeOrderFunnelStagesDto,
     ): Promise<void> {
-        return this.funnelStageService.changeOrder(stageId, dto);
+        return this.funnelStageService.changeOrder(funnelId, stageId, dto);
     }
 
     @ApiOperation({summary: 'Удалить этап воронки'})
-    @Delete(':stageId')
+    @Delete('funnel-stages/:stageId')
     remove(@Param('stageId', ParseUUIDModifyPipe) stageId: string) {
         return this.funnelStageService.removeById(stageId);
     }

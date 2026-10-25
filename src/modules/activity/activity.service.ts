@@ -6,7 +6,7 @@ import {getFullName, updateByIdWithRelations} from '~/utils/helpers';
 
 import {DealHistoryService} from '../deal/services/deal-history.service';
 import {UserService} from '../user/services/user.service';
-import {CreateOrUpdateActivityDto} from './dto/activity.dto';
+import {CreateActivityDto, UpdateActivityDto} from './dto/activity.dto';
 import {ActivityListFiltersDto} from './dto/filters.dto';
 import {Activity} from './entities/activity.entity';
 import type {GroupedActivityEntities} from './types';
@@ -66,33 +66,35 @@ export class ActivityService {
         return {activities, total};
     }
 
-    async create(userId: string, dto: CreateOrUpdateActivityDto): Promise<string> {
+    async create(userId: string, dto: CreateActivityDto): Promise<string> {
         const {dealId, assignedId, ...restDto} = dto;
 
         const activity = await this.activityRepository.save({
             ...restDto,
             assigned: assignedId ? {id: assignedId} : undefined,
-            deal: {id: dealId},
+            deal: dealId ? {id: dealId} : undefined,
             createdBy: {id: userId},
         });
 
         const createdBy = await this.userService.getUserById(userId);
 
-        this.dealHistoryService.createHistoryLog({
-            dealId,
-            changedById: userId,
-            changedByFullname: getFullName({
-                firstName: createdBy.firstName,
-                lastName: createdBy.lastName,
-                patronymic: createdBy.patronymic,
-            }),
-            actionDescription: `Создана новая задача "${activity.title}" для сделки "${activity.deal.title}"`,
-        });
+        if (dealId) {
+            this.dealHistoryService.createHistoryLog({
+                dealId,
+                changedById: userId,
+                changedByFullname: getFullName({
+                    firstName: createdBy.firstName,
+                    lastName: createdBy.lastName,
+                    patronymic: createdBy.patronymic,
+                }),
+                actionDescription: `Создана новая задача "${activity.title}" для сделки "${activity.deal.title}"`,
+            });
+        }
 
         return activity.id;
     }
 
-    async updateById(userId: string, activityId: string, dto: CreateOrUpdateActivityDto): Promise<string> {
+    async updateById(userId: string, activityId: string, dto: UpdateActivityDto): Promise<string> {
         const {assignedId, dealId, ...flatFields} = dto;
 
         const result = await updateByIdWithRelations(this.activityRepository, Activity, activityId, flatFields, {
@@ -106,16 +108,18 @@ export class ActivityService {
 
         const updatedBy = await this.userService.getUserById(userId);
 
-        this.dealHistoryService.createHistoryLog({
-            dealId,
-            changedById: userId,
-            changedByFullname: getFullName({
-                firstName: updatedBy.firstName,
-                lastName: updatedBy.lastName,
-                patronymic: updatedBy.patronymic,
-            }),
-            actionDescription: `Обновлены сведения задачи ${activityId} с текущим названием "${dto.title}"`,
-        });
+        if (dealId) {
+            this.dealHistoryService.createHistoryLog({
+                dealId,
+                changedById: userId,
+                changedByFullname: getFullName({
+                    firstName: updatedBy.firstName,
+                    lastName: updatedBy.lastName,
+                    patronymic: updatedBy.patronymic,
+                }),
+                actionDescription: `Обновлены сведения задачи ${activityId} с текущим названием "${dto.title}"`,
+            });
+        }
 
         return activityId;
     }

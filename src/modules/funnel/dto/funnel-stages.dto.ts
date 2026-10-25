@@ -13,10 +13,6 @@ export class CreateFunnelStagesDto {
     @ApiProperty({type: 'string', enum: FUNNEL_STAGE_TYPE_ENUM})
     @IsString()
     type: FunnelStageType;
-
-    @ApiProperty({type: 'string', format: 'uuid'})
-    @IsUUID()
-    funnelId: string;
 }
 
 export class UpdateFunnelStagesDto {
@@ -34,10 +30,6 @@ export class UpdateFunnelStagesDto {
 }
 
 export class ChangeOrderFunnelStagesDto {
-    @ApiProperty({type: 'string', format: 'uuid'})
-    @IsUUID()
-    funnelId: string;
-
     @ApiProperty({type: 'number'})
     @IsNumber()
     sourceIndex: number;

@@ -9,7 +9,7 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dt
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {ActivityService} from './activity.service';
-import {ActivityDto, CreateOrUpdateActivityDto, GroupedActivityByStatusDto} from './dto/activity.dto';
+import {ActivityDto, CreateActivityDto, GroupedActivityByStatusDto, UpdateActivityDto} from './dto/activity.dto';
 import {ActivityListByStatusFiltersDto, ActivityListFiltersDto} from './dto/filters.dto';
 import {Activity} from './entities/activity.entity';
 import {GroupedActivityEntities} from './types';
@@ -35,7 +35,7 @@ export class ActivityController {
     @ApiOperation({summary: 'Получить список задач с группировкой по статусу'})
     @ApiOkModifyResponse(GroupedActivityByStatusDto, {isArray: true})
     @ApiQuery({name: 'dealId', required: false})
-    @Get('/by-status')
+    @Get('/grouped-by-status')
     async getAllByDealInStatus(filters?: ActivityListByStatusFiltersDto) {
         const {activities, total} = await this.activityService.getList(true, filters);
 
@@ -52,7 +52,7 @@ export class ActivityController {
     @Post()
     async create(
         @UserTokenData('id') userId: string,
-        @Body() dto: CreateOrUpdateActivityDto,
+        @Body() dto: CreateActivityDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         const createdId = await this.activityService.create(userId, dto);
 
@@ -67,7 +67,7 @@ export class ActivityController {
     async update(
         @UserTokenData('id') userId: string,
         @Param('id', ParseUUIDModifyPipe) id: string,
-        @Body() dto: CreateOrUpdateActivityDto,
+        @Body() dto: UpdateActivityDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
         const updatedId = await this.activityService.updateById(userId, id, dto);
 

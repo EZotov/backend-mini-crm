@@ -4,7 +4,6 @@ import {IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID} from 'class-validator';
 
 import {CustomerDto} from '~/modules/customer/dto/customer.dto';
 import {FunnelStagesDto} from '~/modules/funnel/dto/funnel-stages.dto';
-import {Funnel} from '~/modules/funnel/entities/funnel.entity';
 import {UserDto} from '~/modules/user/dto/user.dto';
 
 import {DEAL_STATUS_ENUM} from '../consts';
@@ -82,10 +81,6 @@ export class DealDto {
     @Expose()
     @Type(() => CustomerDto)
     customer: CustomerDto;
-
-    @ApiProperty({type: () => Funnel, description: 'Воронка'})
-    @Expose()
-    funnel: Funnel;
 
     @ApiProperty({type: () => FunnelStagesDto, description: 'Этап воронки'})
     @Expose()
