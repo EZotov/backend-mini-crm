@@ -2,7 +2,7 @@ import {DataSourceOptions} from 'typeorm';
 
 export default (): DataSourceOptions => {
     const {
-        NODE_ENV = 'development',
+        NODE_ENV,
         DB_HOST = 'localhost',
         DB_PORT = '5432',
         DB_USERNAME,
