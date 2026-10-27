@@ -2,6 +2,7 @@ import {
     BadRequestException,
     Injectable,
     InternalServerErrorException,
+    NotFoundException,
     ServiceUnavailableException,
     UnauthorizedException,
 } from '@nestjs/common';
@@ -81,22 +82,59 @@ export class AuthService {
         return {accessToken, refreshToken};
     }
 
-    async generateAccessTokenByRefreshToken(refreshToken: string): Promise<string> {
-        const payload = this.jwtService.decode<JwtPayload>(refreshToken, {json: true});
-
-        const session = await this.getSession(payload.id);
-
-        if (!session || session.refreshToken !== refreshToken) {
-            await this.deleteSession(payload.id);
+    async generateAccessTokenByRefreshTokenPayload(
+        refreshPayload: JwtPayload,
+        refreshToken: string,
+        session?: SessionData,
+    ): Promise<string> {
+        if (!session) {
             throw new UnauthorizedException('Сессия истекла или скомпрометирована');
         }
 
-        const accessToken = await this.jwtService.signAsync(payload, {
+        if (session.refreshToken !== refreshToken) {
+            await this.deleteSession(refreshPayload.id);
+            throw new UnauthorizedException('Токен обновления скомпрометирован');
+        }
+
+        const accessToken = await this.jwtService.signAsync(refreshPayload, {
             secret: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_SECRET),
             expiresIn: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_EXPIRES),
         });
 
+        await this.updateAccessInSession(refreshPayload.id, accessToken);
+
         return accessToken;
+    }
+
+    async getOrRefreshAccessToken(refreshToken: string): Promise<string> {
+        // 1. Валидируем Refresh Token. Если он протух, метод упадет с ошибкой JWT.
+        const refreshTokenPayload = await this.jwtService.verifyAsync(refreshToken, {
+            secret: this.configService.get(ENV_KEYS_CONFIG.JWT_REFRESH_SECRET),
+        });
+
+        // 2. Получаем сессию. Наш getSession сам выбросит ошибку, если сессии нет в Redis.
+        const session = await this.getSession(refreshTokenPayload.id);
+
+        try {
+            // 4. Проверяем старый Access Token на валидность и срок действия
+            await this.jwtService.verifyAsync(session.accessToken, {
+                secret: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_SECRET),
+            });
+
+            // Если verifyAsync не выбросил ошибку — токен еще «живой», возвращаем его
+            return session.accessToken;
+        } catch {
+            // 5. Если старый токен истек (выбросилась ошибка), генерируем новый
+            return this.generateAccessTokenByRefreshTokenPayload(
+                {
+                    id: refreshTokenPayload.id,
+                    email: refreshTokenPayload?.email,
+                    role: refreshTokenPayload?.role,
+                },
+                refreshToken,
+                session,
+            );
+        }
     }
 
     // Sessions
@@ -114,24 +152,21 @@ export class AuthService {
         }
     }
 
-    async getSession(userId: string): Promise<SessionData | null> {
+    async getSession(userId: string): Promise<SessionData> {
         const key = combineUserSessionKey(userId);
 
-        try {
-            const result = await this.redisService.hgetall(key);
+        const isExist = await this.checkSession(userId);
 
-            if (!result || Object.keys(result).length === 0) {
-                return null;
-            }
-
-            return result as unknown as SessionData;
-        } catch (error) {
-            console.error(error);
-            throw new ServiceUnavailableException('Ошибка в получении сессии. Возможно соединение с Redis потеряно');
+        if (!isExist) {
+            throw new InternalServerErrorException('Сессия не найдена или уже истекла');
         }
+
+        const result = await this.redisService.hgetall(key);
+
+        return result as unknown as SessionData;
     }
 
-    async saveSession(data: SessionData) {
+    async saveSession(data: SessionData): Promise<void> {
         const key = combineUserSessionKey(data.userId);
 
         try {
@@ -151,6 +186,18 @@ export class AuthService {
             console.error(error);
             throw new InternalServerErrorException('Ошибка при сохранении сессии');
         }
+    }
+
+    async updateAccessInSession(userId: SessionData['userId'], accessToken: SessionData['accessToken']): Promise<void> {
+        const key = combineUserSessionKey(userId);
+
+        const isExist = await this.checkSession(userId);
+
+        if (!isExist) {
+            throw new NotFoundException('Сессия не найдена или уже истекла');
+        }
+
+        await this.redisService.hset(key, 'accessToken', accessToken);
     }
 
     async deleteSession(userId: string): Promise<void> {

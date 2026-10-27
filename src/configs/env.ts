@@ -1,4 +1,5 @@
 export const ENV_KEYS_CONFIG = {
+    NODE_ENV: 'NODE_ENV',
     PORT: 'PORT',
     DB_HOST: 'DB_HOST',
     DB_PORT: 'DB_PORT',

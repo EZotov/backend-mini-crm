@@ -8,6 +8,7 @@ import {AuthProtected} from '@decorators/auth.decorator';
 import {Cookie} from '@decorators/cookie.decorator';
 import {UserTokenData} from '@decorators/user-auth-data.decorator';
 import {ResponseDto} from '@dto/api.dto';
+import {ENV_KEYS_CONFIG} from '~/configs/env';
 import {clearRefreshTokenCookie, setRefreshTokenInCookie} from '~/utils/helpers';
 
 import {CreateUserDto} from '../user/dto/user.dto';
@@ -23,7 +24,7 @@ export class AuthController {
         private readonly configService: ConfigService,
         private readonly authService: AuthService,
     ) {
-        this.isProduction = this.configService.get<string>('NODE_ENV') === 'production';
+        this.isProduction = this.configService.get<string>(ENV_KEYS_CONFIG.NODE_ENV) === 'production';
     }
 
     @ApiOperation({summary: 'Зарегистрировать нового пользователя'})
@@ -36,12 +37,11 @@ export class AuthController {
     ): Promise<ResponseDto<TokensDto>> {
         const {userId, ...tokens} = await this.authService.registration(dto);
 
-        const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
         const userAgent = req.headers['user-agent'] || 'unknown';
 
         await this.authService.saveSession({
             userId,
-            ip,
+            accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
             userAgent,
             createdAt: Date.now().toString(),
@@ -67,12 +67,11 @@ export class AuthController {
     ): Promise<ResponseDto<TokensDto>> {
         const {userId, ...tokens} = await this.authService.login(dto);
 
-        const ip = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1';
         const userAgent = req.headers['user-agent'] || 'unknown';
 
         await this.authService.saveSession({
             userId,
-            ip,
+            accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
             userAgent,
             createdAt: Date.now().toString(),
@@ -96,7 +95,8 @@ export class AuthController {
         @Res({passthrough: true}) res: Response,
     ): Promise<ResponseDto<RefreshAccessTokenDto>> {
         try {
-            const accessToken = await this.authService.generateAccessTokenByRefreshToken(refreshToken);
+            // Получаем валидный старый или новый access token
+            const accessToken = await this.authService.getOrRefreshAccessToken(refreshToken);
 
             return new ResponseDto({
                 data: new RefreshAccessTokenDto({accessToken}),
