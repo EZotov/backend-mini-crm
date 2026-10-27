@@ -107,16 +107,16 @@ export class AuthService {
     }
 
     async getOrRefreshAccessToken(refreshToken: string): Promise<string> {
-        // 1. Валидируем Refresh Token. Если он протух, метод упадет с ошибкой JWT.
+        // Валидируем Refresh Token. Если он протух, метод упадет с ошибкой JWT.
         const refreshTokenPayload = await this.jwtService.verifyAsync(refreshToken, {
             secret: this.configService.get(ENV_KEYS_CONFIG.JWT_REFRESH_SECRET),
         });
 
-        // 2. Получаем сессию. Наш getSession сам выбросит ошибку, если сессии нет в Redis.
+        // Получаем сессию. Наш getSession сам выбросит ошибку, если сессии нет в Redis.
         const session = await this.getSession(refreshTokenPayload.id);
 
         try {
-            // 4. Проверяем старый Access Token на валидность и срок действия
+            // Проверяем старый Access Token на валидность и срок действия
             await this.jwtService.verifyAsync(session.accessToken, {
                 secret: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_SECRET),
             });
