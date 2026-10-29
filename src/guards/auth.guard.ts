@@ -1,5 +1,6 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
+import {JsonWebTokenError} from '@nestjs/jwt';
 import {AuthGuard, PassportStrategy} from '@nestjs/passport';
 import type {Request} from 'express';
 import {ExtractJwt, Strategy} from 'passport-jwt';
@@ -56,12 +57,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             throw error;
         }
 
-        if (info?.name === JWT_ERRORS.JWT_EXPIRED) {
-            throw new UnauthorizedException('Срок действия токена истек.');
-        }
+        if (info instanceof JsonWebTokenError) {
+            if (info.name === JWT_ERRORS.JWT_EXPIRED) {
+                throw new UnauthorizedException('Срок действия токена истек.');
+            }
 
-        if (info?.name === JWT_ERRORS.JWT_INVALID) {
-            throw new UnauthorizedException('Невалидный токен.');
+            if (info.name === JWT_ERRORS.JWT_INVALID) {
+                throw new UnauthorizedException('Невалидный токен.');
+            }
         }
 
         if (!user) {

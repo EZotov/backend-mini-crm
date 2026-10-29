@@ -7,10 +7,11 @@ import {
     UnauthorizedException,
 } from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {JwtService} from '@nestjs/jwt';
+import {JsonWebTokenError, JwtService} from '@nestjs/jwt';
 import {InjectRedis} from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 
+import {JWT_ERRORS} from '@consts/errors';
 import {JwtPayload} from '@interfaces/auth.interface';
 import {ENV_KEYS_CONFIG} from '~/configs/env';
 import {combineUserSessionKey} from '~/utils/helpers';
@@ -107,10 +108,24 @@ export class AuthService {
     }
 
     async getOrRefreshAccessToken(refreshToken: string): Promise<string> {
-        // Валидируем Refresh Token. Если он протух, метод упадет с ошибкой JWT.
-        const refreshTokenPayload = await this.jwtService.verifyAsync(refreshToken, {
-            secret: this.configService.get(ENV_KEYS_CONFIG.JWT_REFRESH_SECRET),
-        });
+        let refreshTokenPayload;
+
+        try {
+            // Валидируем Refresh Token. Если он протух, метод упадет с ошибкой JWT.
+            refreshTokenPayload = await this.jwtService.verifyAsync(refreshToken, {
+                secret: this.configService.get(ENV_KEYS_CONFIG.JWT_REFRESH_SECRET),
+            });
+        } catch (error) {
+            if (error instanceof JsonWebTokenError) {
+                if (error.name === JWT_ERRORS.JWT_EXPIRED) {
+                    throw new UnauthorizedException('Срок действия refresh-токена истек.');
+                }
+
+                if (error.name === JWT_ERRORS.JWT_INVALID) {
+                    throw new UnauthorizedException('Невалидный refresh-токен.');
+                }
+            }
+        }
 
         // Получаем сессию. Наш getSession сам выбросит ошибку, если сессии нет в Redis.
         const session = await this.getSession(refreshTokenPayload.id);
