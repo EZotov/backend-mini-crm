@@ -90,21 +90,13 @@ export class AuthController {
     @ApiOperation({summary: 'Обновить токен аутентификации'})
     @ApiOkModifyResponse(RefreshAccessTokenDto)
     @Post('refresh')
-    async refresh(
-        @Cookie('refreshToken') refreshToken: string,
-        @Res({passthrough: true}) res: Response,
-    ): Promise<ResponseDto<RefreshAccessTokenDto>> {
-        try {
-            // Получаем валидный старый или новый access token
-            const accessToken = await this.authService.getOrRefreshAccessToken(refreshToken);
+    async refresh(@Cookie('refreshToken') refreshToken: string): Promise<ResponseDto<RefreshAccessTokenDto>> {
+        // Получаем валидный старый или новый access token
+        const accessToken = await this.authService.getOrRefreshAccessToken(refreshToken);
 
-            return new ResponseDto({
-                data: new RefreshAccessTokenDto({accessToken}),
-            });
-        } catch (error) {
-            clearRefreshTokenCookie(res, this.isProduction);
-            throw error;
-        }
+        return new ResponseDto({
+            data: new RefreshAccessTokenDto({accessToken}),
+        });
     }
 
     @ApiOperation({summary: 'Выйти из системы'})

@@ -108,6 +108,10 @@ export class AuthService {
     }
 
     async getOrRefreshAccessToken(refreshToken: string): Promise<string> {
+        if (!refreshToken) {
+            throw new UnauthorizedException('Refresh-токен не передан');
+        }
+
         let refreshTokenPayload;
 
         try {
