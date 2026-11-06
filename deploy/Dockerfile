@@ -26,6 +26,7 @@ RUN npm install -g pm2
 RUN yarn workspaces focus --production
 
 COPY --from=builder /app/dist ./dist
+COPY migrations ./migrations
 COPY ./deploy/ecosystem.config.js ./
 
 EXPOSE 3001
