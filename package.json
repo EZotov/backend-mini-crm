@@ -13,13 +13,13 @@
     "start:debug": "cross-env NODE_ENV=development nest start --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "migration:generate": "yarn migration:data-source -- migration:generate",
     "migration:data-source": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d ./src/configs/db/data-source.ts",
-    "migration:run": "yarn migration:data-source -- migration:run",
-    "migration:revert": "yarn migration:data-source -- migration:revert",
     "migration:data-source:prod": "cross-env NODE_ENV=production node ./node_modules/typeorm/cli.js -d ./dist/configs/db/data-source.js",
-    "migration:run:prod": "yarn migration:data-source:prod -- migration:run",
-    "migration:revert:prod": "yarn migration:data-source:prod -- migration:revert"
+    "migration:generate": "yarn migration:data-source migration:generate",
+    "migration:run": "yarn migration:data-source migration:run",
+    "migration:revert": "yarn migration:data-source migration:revert",
+    "migration:run:prod": "yarn migration:data-source:prod migration:run",
+    "migration:revert:prod": "yarn migration:data-source:prod migration:revert"
   },
   "dependencies": {
     "@nestjs-modules/ioredis": "^2.3.1",
