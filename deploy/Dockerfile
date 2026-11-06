@@ -23,10 +23,10 @@ COPY .yarn ./.yarn
 
 # Устанавливаем PM2 глобально через npm
 RUN npm install -g pm2
-RUN yarn install --immutable --production
+RUN yarn workspaces focus --production
 
 COPY --from=builder /app/dist ./dist
-COPY deploy/ecosystem.config.js ./
+COPY ./deploy/ecosystem.config.js ./
 
 EXPOSE 3001
 
