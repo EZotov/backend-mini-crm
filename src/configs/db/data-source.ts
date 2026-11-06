@@ -10,7 +10,7 @@ const isDev = NODE_ENV === 'development';
 
 const cliSourceData = {
     entities: isDev ? ['src/**/*.entity.{ts,js}'] : ['dist/**/*.entity.js'],
-    migrations: ['migrations/*.js}'],
+    migrations: isDev ? ['migrations/*.ts'] : ['dist/migrations/*.js'],
 };
 
 const dataSource = new DataSource({
