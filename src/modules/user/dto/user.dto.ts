@@ -57,6 +57,25 @@ export class UpdateUserDto {
     @IsUUID()
     roleId: string;
 }
+
+export class UpdateMeUserDto {
+    @ApiProperty()
+    @IsEmail(undefined, {message: 'Некорректный формат почты'})
+    email: string;
+
+    @ApiProperty()
+    @IsString()
+    firstName: string;
+
+    @ApiProperty({type: 'string', nullable: true})
+    @IsString()
+    @IsOptional()
+    patronymic: string | null;
+
+    @ApiProperty()
+    @IsString()
+    lastName: string;
+}
 export class UpdatePasswordDto {
     @ApiProperty({description: 'Новый пароль'})
     @IsString()

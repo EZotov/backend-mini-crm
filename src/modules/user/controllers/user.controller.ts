@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Post, Put, Query} from '@nestjs/common';
 import {ApiOperation, ApiTags} from '@nestjs/swagger';
 import {plainToInstance} from 'class-transformer';
 
@@ -10,7 +10,7 @@ import {CollectionResponseDto, CreateResponseDto, ResponseDto} from '@dto/api.dt
 import {ParseUUIDModifyPipe} from '~/utils/pipes/uuid.pipe';
 
 import {UserListFiltersDto} from '../dto/filters.dto';
-import {UpdatePasswordDto, UpdateUserDto, UserDto} from '../dto/user.dto';
+import {UpdateMeUserDto, UpdatePasswordDto, UpdateUserDto, UserDto} from '../dto/user.dto';
 import {UserService} from '../services/user.service';
 
 @ApiTags('Пользователи')
@@ -62,7 +62,14 @@ export class UserController {
 
     @ApiOperation({summary: 'Удалить пользователя (для админа)'})
     @Delete(':id')
-    deleteUser(@Param('id', ParseUUIDModifyPipe) userId: string): Promise<void> {
+    deleteUser(
+        @Param('id', ParseUUIDModifyPipe) userId: string,
+        @UserTokenData('id', ParseUUIDModifyPipe) tokenUserId: string,
+    ): Promise<void> {
+        if (userId === tokenUserId) {
+            throw new ForbiddenException('Нельзя удалить свой профиль');
+        }
+
         return this.userService.removeUserById(userId);
     }
 }
@@ -89,9 +96,9 @@ export class MeUserController {
     @Put()
     async updateMyProfile(
         @UserTokenData('id', ParseUUIDModifyPipe) userId: string,
-        @Body() dto: UpdateUserDto,
+        @Body() dto: UpdateMeUserDto,
     ): Promise<ResponseDto<CreateResponseDto>> {
-        await this.userService.updateUserProfile(userId, dto);
+        await this.userService.updateMyProfile(userId, dto);
 
         return new ResponseDto({
             data: new CreateResponseDto({id: userId}),

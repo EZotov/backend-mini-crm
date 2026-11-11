@@ -9,7 +9,7 @@ import {getHashedPassword, getOffsetAndCheckPaginationParams, updateByIdWithRela
 
 import {LoginRequestDto} from '../../auth/dto/auth.dto';
 import {UserListFiltersDto} from '../dto/filters.dto';
-import {CreateUserDto, UpdatePasswordDto, UpdateUserDto} from '../dto/user.dto';
+import {CreateUserDto, UpdateMeUserDto, UpdatePasswordDto, UpdateUserDto} from '../dto/user.dto';
 import {User} from '../entities/user.entity';
 import {RoleService} from './role.service';
 
@@ -94,6 +94,16 @@ export class UserService {
 
         if (!result.affected) {
             throw new NotFoundException(`Не удалось обновить данные пользователя с ID ${userId} или он не был найден`);
+        }
+
+        return userId;
+    }
+
+    async updateMyProfile(userId: string, updateDto: UpdateMeUserDto): Promise<string> {
+        const result = await this.userRepository.update(userId, updateDto);
+
+        if (!result.affected) {
+            throw new NotFoundException(`Не удалось обновить пользователя с ID ${userId} или он не был найден`);
         }
 
         return userId;
