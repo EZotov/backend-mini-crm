@@ -16,21 +16,31 @@ import {Server, Socket} from 'socket.io';
 import {JwtPayload} from '@interfaces/auth.interface';
 import {ENV_KEYS_CONFIG} from '~/configs/env';
 
-export enum TaskEventType {
-    SUBSCRIBE = 'SUBSCRIBE',
-    UNSUBSCRIBE = 'UNSUBSCRIBE',
-}
+export type EventType = 'deals' | 'general' | 'tasks';
+
+export type EventPayload<TData extends Record<string, unknown> = Record<string, unknown>> = {
+    entityId: string;
+    message: string;
+    entityType?: EventType;
+} & TData;
+
+type TaskEventSubState = 'SUBSCRIBE' | 'UNSUBSCRIBE';
+
+export const TaskEventState: Record<TaskEventSubState, TaskEventSubState> = {
+    SUBSCRIBE: 'SUBSCRIBE',
+    UNSUBSCRIBE: 'UNSUBSCRIBE',
+};
 
 class TaskEventDto {
-    @IsEnum(TaskEventType)
-    type: TaskEventType;
+    @IsEnum(TaskEventState)
+    type: TaskEventSubState;
 
     @IsString()
     @IsNotEmpty()
     taskId: string;
 
     @IsOptional()
-    payload?: unknown;
+    payload?: EventPayload;
 }
 
 @WebSocketGateway()
@@ -85,12 +95,12 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
         const roomName = data?.taskId ? `task_${data.taskId}` : 'tasks_all';
 
         switch (data?.type) {
-            case TaskEventType.SUBSCRIBE: {
+            case TaskEventState.SUBSCRIBE: {
                 await client.join(roomName);
 
                 return {status: 'subscribed', room: roomName};
             }
-            case TaskEventType.UNSUBSCRIBE: {
+            case TaskEventState.UNSUBSCRIBE: {
                 await client.leave(roomName);
 
                 return {status: 'unsubscribed', room: roomName};
@@ -100,7 +110,11 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
         }
     }
 
-    emitToRooms(rooms: string | string[], event: string, payload: unknown) {
-        this.server.to(rooms).emit(event, payload);
+    emitToRooms(rooms: string | string[], eventType: EventType, payload?: EventPayload) {
+        this.server.to(rooms).emit(eventType, payload);
+    }
+
+    emitToAll(eventType: EventType, payload?: EventPayload) {
+        this.server.emit(eventType, payload);
     }
 }

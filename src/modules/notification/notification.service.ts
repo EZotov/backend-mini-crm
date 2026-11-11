@@ -1,7 +1,7 @@
 import {Injectable, Type} from '@nestjs/common';
 import {Mailable, MailableSendOptions, Mailer} from '@nestjs/mail';
 
-import {WSGateway} from './gateways/websocket.gateway';
+import {EventPayload, EventType, WSGateway} from './gateways/websocket.gateway';
 
 @Injectable()
 export class NotificationService {
@@ -10,17 +10,33 @@ export class NotificationService {
         private readonly mailerService: Mailer,
     ) {}
 
-    // Отправка личного общего уведомления пользователю (работает сразу после авторизации)
-    sendGeneralMessageToUser(userId: string, payload: unknown) {
-        this.wsGateway.emitToRooms(`user_${userId}`, 'general', payload);
+    /**
+     * Отправка личного уведомления пользователю
+     */
+    sendMessageToUser(userId: string, eventType: EventType, payload: EventPayload) {
+        this.wsGateway.emitToRooms(`user_${userId}`, eventType, payload);
     }
 
-    // Отправка обновления по конкретной задаче (тем, кто подписался на taskId или на все задачи)
-    sendTaskUpdateMessage(taskId: string, payload: Record<string, unknown>) {
-        this.wsGateway.emitToRooms([`task_${taskId}`, 'tasks_all'], 'tasks', {taskId, ...payload});
+    /**
+     * Отправка общего уведомления всем подключённым пользователям
+     */
+    sendMessageToAll(eventType: EventType, payload: EventPayload) {
+        this.wsGateway.emitToAll(eventType, payload);
     }
 
-    // Отправка email сообщения по шаблону
+    /**
+     * Отправка обновления по конкретной задаче (тем, кто подписался на taskId или на все задачи)
+     */
+    sendTaskMessage(taskId: string, payload: EventPayload) {
+        this.wsGateway.emitToRooms([`task_${taskId}`, 'tasks_all'], 'tasks', {
+            ...payload,
+            entityId: taskId,
+        });
+    }
+
+    /**
+     * Отправка email сообщения по шаблону
+     */
     async sendEmail(to: string, mail: Type<Mailable>, data?: MailableSendOptions<void>['data']): Promise<void> {
         await this.mailerService.send(mail, {
             to,
