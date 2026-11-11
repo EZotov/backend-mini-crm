@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Demo</title>
+    </head>
+    <body style="margin: 0; padding: 20px; background-color: #f4f4f5; font-family: Arial, sans-serif">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td align="center">
+                    <table
+                        width="600"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="background: #ffffff; border-radius: 8px; padding: 32px; color: #18181b"
+                    >
+                        <tr>
+                            <td>
+                                <h2 style="margin: 0 0 16px">Привет, {{ userName }}!</h2>
+                                <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.5; color: #3f3f46">
+                                    Это тестовое письмо из <strong>minicrm</strong>. Отправка через Яндекс SMTP работает
+                                    корректно.
+                                </p>
+                                <a
+                                    href="{{ actionUrl }}"
+                                    style="
+                                        display: inline-block;
+                                        padding: 12px 24px;
+                                        background-color: #2563eb;
+                                        color: #ffffff;
+                                        text-decoration: none;
+                                        border-radius: 6px;
+                                        font-weight: bold;
+                                    "
+                                >
+                                    Открыть CRM
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
