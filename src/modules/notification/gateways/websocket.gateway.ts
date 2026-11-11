@@ -16,7 +16,6 @@ import {Server, Socket} from 'socket.io';
 import {JwtPayload} from '@interfaces/auth.interface';
 import {ENV_KEYS_CONFIG} from '~/configs/env';
 
-// Типы событий для задач
 export enum TaskEventType {
     SUBSCRIBE = 'SUBSCRIBE',
     UNSUBSCRIBE = 'UNSUBSCRIBE',
@@ -60,7 +59,7 @@ export class WSGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayD
                 secret: this.configService.get(ENV_KEYS_CONFIG.JWT_ACCESS_SECRET),
             });
 
-            // 3. Сохраняем данные пользователя прямо в объект сокета
+            // Сохраняем данные пользователя прямо в объект сокета
             client.data.user = payload;
 
             await client.join(`user_${payload.id}`);
