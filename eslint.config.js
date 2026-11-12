@@ -8,7 +8,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 
 export default defineConfig(
     {
-        ignores: ['eslint.config.js'],
+        ignores: ['eslint.config.js', 'deploy'],
     },
     eslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,

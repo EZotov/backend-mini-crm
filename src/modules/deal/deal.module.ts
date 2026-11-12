@@ -8,10 +8,11 @@ import {DealHistory} from './entities/deal-history.entity';
 import {SlaLog} from './entities/sla.entity';
 import {DealService} from './services/deal.service';
 import {DealHistoryService} from './services/deal-history.service';
+import {SlaMonitorService} from './services/deal-sla-monitor.service';
 
 @Module({
     imports: [TypeOrmModule.forFeature([Deal, DealHistory, SlaLog]), UserModule],
-    providers: [DealService, DealHistoryService],
+    providers: [DealService, DealHistoryService, SlaMonitorService],
     controllers: [DealController],
     exports: [DealHistoryService],
 })

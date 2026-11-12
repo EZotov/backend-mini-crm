@@ -1,7 +1,8 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
+import {ROLES} from '@consts/index';
 import {getFullName, updateByIdWithRelations} from '~/utils/helpers';
 
 import {DealHistoryService} from '../deal/services/deal-history.service';
@@ -124,7 +125,24 @@ export class ActivityService {
         return activityId;
     }
 
-    async removeById(activityId: string): Promise<void> {
+    async removeById(currentUserId: string, activityId: string): Promise<void> {
+        const activity = await this.activityRepository.findOne({
+            where: {id: activityId},
+            relations: {
+                assigned: true,
+            },
+        });
+
+        if (
+            activity?.assigned?.id &&
+            activity.assigned.id !== currentUserId &&
+            activity?.assigned?.role?.title !== ROLES.ADMIN
+        ) {
+            throw new ForbiddenException(
+                'При назначенной задаче, удалять её может только исполнитель или администратор',
+            );
+        }
+
         const result = await this.activityRepository.delete(activityId);
 
         if (!result.affected) {

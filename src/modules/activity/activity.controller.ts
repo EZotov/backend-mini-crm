@@ -78,7 +78,7 @@ export class ActivityController {
 
     @ApiOperation({summary: 'Удалить задачу'})
     @Delete(':id')
-    delete(@Param('id', ParseUUIDModifyPipe) id: string): Promise<void> {
-        return this.activityService.removeById(id);
+    delete(@Param('id', ParseUUIDModifyPipe) id: string, @UserTokenData('id') currentUserId: string): Promise<void> {
+        return this.activityService.removeById(currentUserId, id);
     }
 }

@@ -1,8 +1,8 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 
-import {DEFAULT_ORDER} from '@consts/index';
+import {DEFAULT_ORDER, ROLES} from '@consts/index';
 import {getFullName, getOffsetAndCheckPaginationParams, updateByIdWithRelations} from '~/utils/helpers';
 
 import {UserService} from '../../user/services/user.service';
@@ -206,11 +206,19 @@ export class DealService {
         });
     }
 
-    async deleteById(id: string): Promise<void> {
-        const result = await this.dealRepository.delete(id);
+    async deleteById(currentUserId: string, dealId: string): Promise<void> {
+        const deal = await this.getById(dealId);
+
+        if (deal?.manager?.id && deal.manager.id !== currentUserId && deal?.manager?.role?.title !== ROLES.ADMIN) {
+            throw new ForbiddenException(
+                'При назначенном менеджере, сделку может удалить только текущий менеджер или администратор',
+            );
+        }
+
+        const result = await this.dealRepository.delete(dealId);
 
         if (!result.affected) {
-            throw new NotFoundException(`Не удалось удалить сделку с ID ${id} или она не была найдена`);
+            throw new NotFoundException(`Не удалось удалить сделку с ID ${dealId}`);
         }
     }
 

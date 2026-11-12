@@ -1,5 +1,6 @@
 import {Module} from '@nestjs/common';
 import {ConfigModule, ConfigService} from '@nestjs/config';
+import {ScheduleModule} from '@nestjs/schedule';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {RedisModule} from '@nestjs-modules/ioredis';
 
@@ -35,6 +36,7 @@ import {UserModule} from './user/user.module';
                 },
             }),
         }),
+        ScheduleModule.forRoot(),
         CompanyModule,
         CustomerModule,
         UserModule,

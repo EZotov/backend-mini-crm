@@ -98,7 +98,7 @@ export class DealController {
     @ApiOkModifyResponse(CreateResponseDto)
     @Patch(':id/funnel-stage')
     changeFunnelStage(
-        @UserTokenData('id') currentUserid: string,
+        @UserTokenData('id') currentUserId: string,
         @Param('id', ParseUUIDModifyPipe) id: string,
         @Body() dto: ChangeDealFunnelStage,
     ): ResponseDto<string> {
@@ -125,7 +125,10 @@ export class DealController {
 
     @ApiOperation({summary: 'Удалить сделку'})
     @Delete(':id')
-    delete(@Param('id', ParseUUIDModifyPipe) id: string): Promise<void> {
-        return this.dealService.deleteById(id);
+    delete(
+        @Param('id', ParseUUIDModifyPipe) dealId: string,
+        @UserTokenData('id') currentUserId: string,
+    ): Promise<void> {
+        return this.dealService.deleteById(currentUserId, dealId);
     }
 }
