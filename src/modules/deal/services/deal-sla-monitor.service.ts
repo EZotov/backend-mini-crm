@@ -1,6 +1,7 @@
-import {Inject, Injectable, Logger} from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
 import {Cron, CronExpression} from '@nestjs/schedule';
 import {InjectRepository} from '@nestjs/typeorm';
+import {InjectRedis} from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import {DataSource, LessThan, Repository} from 'typeorm';
 
@@ -16,7 +17,7 @@ export class SlaMonitorService {
         @InjectRepository(Deal)
         private readonly dealRepository: Repository<Deal>,
         private readonly dataSource: DataSource,
-        @Inject() private readonly redis: Redis,
+        @InjectRedis() private readonly redisService: Redis,
     ) {}
 
     private readonly logger = new Logger(SlaMonitorService.name);
@@ -60,7 +61,7 @@ export class SlaMonitorService {
         }
 
         const lockValue = `${process.pid}-${Date.now()}`;
-        const acquired = await this.redis.set(this.LOCK_KEY, lockValue, 'PX', this.LOCK_TTL_MS, 'NX');
+        const acquired = await this.redisService.set(this.LOCK_KEY, lockValue, 'PX', this.LOCK_TTL_MS, 'NX');
 
         if (!acquired) {
             return;
@@ -99,10 +100,10 @@ export class SlaMonitorService {
                 }
             }
         } finally {
-            const currentLock = await this.redis.get(this.LOCK_KEY);
+            const currentLock = await this.redisService.get(this.LOCK_KEY);
 
             if (currentLock === lockValue) {
-                await this.redis.del(this.LOCK_KEY);
+                await this.redisService.del(this.LOCK_KEY);
             }
 
             this.isProcessing = false;
