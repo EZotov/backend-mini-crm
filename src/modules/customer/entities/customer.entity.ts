@@ -24,7 +24,7 @@ export class Customer {
     @Column({name: 'last_name'})
     lastName: string;
 
-    @ApiProperty({nullable: true})
+    @ApiProperty({type: 'string', nullable: true})
     @Expose()
     @Column({type: 'varchar', nullable: true})
     patronymic: string | null;
